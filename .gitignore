@@ -18,3 +18,12 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# Database
+/var/data.db
+
+# Uploads
+/public/uploads/
+
+# Claude Code
+.claude/
