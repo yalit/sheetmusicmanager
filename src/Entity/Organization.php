@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\OrganizationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -11,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Organization
 {
     use TimestampableEntity;
+    use BlameableEntity;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,12 +26,23 @@ class Organization
     #[Assert\Length(max: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     #[Assert\NotBlank]
     private ?string $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
+
+    /**
+     * @var Collection<int, Person>
+     */
+    #[ORM\OneToMany(targetEntity: Person::class, mappedBy: 'organization', orphanRemoval: true)]
+    private Collection $persons;
+
+    public function __construct()
+    {
+        $this->persons = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -73,5 +88,35 @@ class Organization
     public function __toString(): string
     {
         return $this->name ?? '';
+    }
+
+    /**
+     * @return Collection<int, Person>
+     */
+    public function getPersons(): Collection
+    {
+        return $this->persons;
+    }
+
+    public function addPerson(Person $person): static
+    {
+        if (!$this->persons->contains($person)) {
+            $this->persons->add($person);
+            $person->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removePerson(Person $person): static
+    {
+        if ($this->persons->removeElement($person)) {
+            // set the owning side to null (unless already changed)
+            if ($person->getOrganization() === $this) {
+                $person->setOrganization(null);
+            }
+        }
+
+        return $this;
     }
 }

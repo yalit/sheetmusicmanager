@@ -20,12 +20,12 @@ Create all Doctrine entities with proper fields, relationships, enums, and repos
 **Description**: Create the Organization entity for multi-tenancy.
 
 **Tasks**:
-- [ ] Generate entity: `php bin/console make:entity Organization`
-- [ ] Add fields: name, type, logo
-- [ ] Add Timestampable trait
-- [ ] Add Blameable trait
+- [X] Generate entity: `php bin/console make:entity Organization`
+- [X] Add fields: name, type, logo
+- [X] Add Timestampable trait
+- [X] Add Blameable trait
 - [ ] Define relationships
-- [ ] Add validation constraints
+- [X] Add validation constraints
 
 **Entity Code** (`src/Entity/Organization.php`):
 ```php
