@@ -104,6 +104,119 @@ public function configureFilters(Filters $filters): Filters
 }
 ```
 
+#### Filter 3: EntityFilter with Autocomplete (NEW in v4.27.3!) 🔥
+**What**: Filter by entity associations with Ajax-powered autocomplete - perfect for large datasets!
+
+**The Problem**:
+Before v4.27.3, EntityFilter would load ALL entities at once. With hundreds of composers, this would freeze the page!
+
+**The Solution**:
+```php
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+
+// In your CRUD controller
+public function configureFilters(Filters $filters): Filters
+{
+    return $filters
+        ->add(EntityFilter::new('composer')
+            ->autocomplete()  // 🔥 NEW! Loads composers dynamically via Ajax
+        )
+        ->add(EntityFilter::new('arranger')
+            ->autocomplete()
+        )
+        ->add(EntityFilter::new('organization')
+            ->autocomplete()
+        );
+}
+```
+
+**Benefits**:
+- ✅ Loads options dynamically as user types
+- ✅ Fast even with thousands of entities
+- ✅ Same great UX as AssociationField in forms
+- ✅ Uses TomSelect under the hood
+
+**Demo Impact**:
+- Show filtering 100+ composers without page freeze
+- Type to search - instant results
+- Modern, professional UX
+
+**Note**: This is different from AssociationField autocomplete:
+- **EntityFilter**: Filters data on **list pages**
+- **AssociationField**: Selects entities in **forms**
+- Both use autocomplete, different contexts!
+
+---
+
+### 2a. CollectionField Rendering (Enhanced in v4.27.6!) 🔥
+
+**What**: Customize how collection items are displayed in lists and forms
+
+**Where This Applies**: SheetReference DTO collection in Sheet entity
+
+**The Enhancement**:
+```php
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+
+yield CollectionField::new('references')
+    ->setEntryType(SheetReferenceType::class)
+
+    // NEW in v4.27.6: Customize how items are displayed
+    ->setEntryToStringMethod('getDisplayString')  // Custom display method
+
+    // Control rendering length
+    ->setTemplatePath('admin/field/sheet_references.html.twig')
+
+    // For associations, CrudFormType is now automatic default
+    ->allowAdd()
+    ->allowDelete()
+    ->setFormTypeOptions([
+        'by_reference' => false,
+    ]);
+```
+
+**Custom Display Method** (in SheetReference DTO):
+```php
+class SheetReference
+{
+    public string $referenceCode = '';
+    public string $referenceType = '';
+
+    // NEW: Custom display for collections
+    public function getDisplayString(): string
+    {
+        return sprintf('[%s] %s',
+            strtoupper($this->referenceType),
+            $this->referenceCode
+        );
+    }
+
+    // Example output: "[CATALOG] BW-123"
+}
+```
+
+**In List View**:
+Instead of seeing:
+```
+References: SheetReference, SheetReference, SheetReference
+```
+
+You see:
+```
+References: [CATALOG] BW-123, [PUBLISHER] PUB-456, [INTERNAL] INT-789
+```
+
+**Benefits**:
+- ✅ Readable collection display without clicking through
+- ✅ Customizable per entity needs
+- ✅ Automatic CrudFormType for associations
+- ✅ Professional presentation
+
+**Demo Impact**:
+- Show clean, readable reference codes in sheet lists
+- No need to open detail view to see references
+- Modern, polished UX
+
 ---
 
 ### 3. Export Using Filters

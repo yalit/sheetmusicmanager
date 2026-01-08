@@ -152,12 +152,14 @@ class SheetReference
 | **Basic CRUD** | Initial showcase | All entities |
 | **Specific queries** | Custom repository queries | "Sheets never in a setlist"<br>"Most used composer" |
 | **Filter extension** | Custom filters | "Has PDF file"<br>"Difficulty + Status combined" |
+| **EntityFilter autocomplete** 🔥 NEW! | Ajax filters (v4.27.3) | Filter by Composer/Arranger with autocomplete |
 | **Export with filters** | Export action | Sheet catalog with active filters |
 | **Action extension** | Batch actions | "Archive selected sheets"<br>"Add sheets to setlist" |
 | **Field extension** | Custom field type | SheetReference collection field |
+| **CollectionField rendering** 🔥 NEW! | Enhanced display (v4.27.6) | SheetReference display: "[CATALOG] BW-123" |
 | **Form extension** | Custom form layout | Sheet form with conditional fields |
 | **File handling** | Upload fields | Sheet: PDF + cover image<br>Organization: logo |
-| **Many-to-One relationships** | Entity relations | Sheet → Composer/Arranger<br>All → Organization |
+| **Many-to-One relationships** | Entity relations + TomSelect | Sheet → Composer/Arranger with autocomplete<br>All → Organization |
 | **Custom actions** | Entity actions | "Generate Setlist PDF"<br>"Preview Sheet"<br>"Mark as Performed" |
 | **Role-based access** | Security/voters | ROLE_CONDUCTOR: manage setlists<br>ROLE_LIBRARIAN: manage sheets<br>ROLE_MEMBER: read-only |
 | **Multi-tenancy** | Query extension | Organization scoping on all queries |
@@ -349,6 +351,11 @@ step-4-advanced
 3. **Symfony ecosystem integration**: Security, forms, Doctrine - all work together
 4. **Real-world features**: Multi-tenancy, roles, file handling - not toy examples
 5. **Developer experience**: Fast to build, easy to maintain
+6. **🔥 Actively maintained & modern**: Latest features (v4.27.6 - Jan 2025):
+   - EntityFilter autocomplete (v4.27.3) - Ajax filtering for large datasets
+   - CollectionField rendering (v4.27.6) - Beautiful collection displays
+   - Symfony 8 compatibility - Future-proof
+   - TomSelect integration - Modern autocomplete everywhere
 
 ---
 

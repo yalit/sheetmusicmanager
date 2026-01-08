@@ -85,14 +85,21 @@ class SheetReferenceType extends AbstractType
 
 ---
 
-### Story 9.2: Implement SheetReference Collection Field
+### Story 9.2: Implement SheetReference Collection Field (Enhanced in v4.27.6!) 🔥
 
-**Description**: Add collection field to Sheet CRUD for managing multiple references.
+**Description**: Add collection field to Sheet CRUD for managing multiple references, using the latest CollectionField rendering enhancements.
+
+**NEW in v4.27.6**:
+- `setEntryToStringMethod()` - customize how collection items are displayed
+- Automatic CrudFormType for associations
+- Better control over collection rendering
 
 **Tasks**:
 - [ ] Update Sheet entity to store references as array
-- [ ] Add CollectionField to Sheet CRUD
+- [ ] Update SheetReference DTO with getDisplayString() method
+- [ ] Add CollectionField to Sheet CRUD with new features
 - [ ] Configure allow_add and allow_delete
+- [ ] Use setEntryToStringMethod() for better display
 - [ ] Test adding/removing references
 - [ ] Display references in list/detail views
 
@@ -115,6 +122,56 @@ public function setReferences(?array $references): self
 }
 ```
 
+**SheetReference DTO with Display Method** (`src/DTO/SheetReference.php`):
+```php
+<?php
+
+namespace App\DTO;
+
+use Symfony\Component\Validator\Constraints as Assert;
+
+class SheetReference
+{
+    #[Assert\NotBlank]
+    public string $referenceCode = '';
+
+    #[Assert\NotBlank]
+    public string $referenceType = '';
+
+    // NEW in v4.27.6: Custom display method for collections! 🔥
+    public function getDisplayString(): string
+    {
+        return sprintf('[%s] %s',
+            strtoupper($this->referenceType),
+            $this->referenceCode
+        );
+    }
+
+    // Also works with __toString for backward compatibility
+    public function __toString(): string
+    {
+        return $this->getDisplayString();
+    }
+
+    // Serialization methods...
+    public function toArray(): array
+    {
+        return [
+            'reference_code' => $this->referenceCode,
+            'reference_type' => $this->referenceType,
+        ];
+    }
+
+    public static function fromArray(array $data): self
+    {
+        $ref = new self();
+        $ref->referenceCode = $data['reference_code'] ?? '';
+        $ref->referenceType = $data['reference_type'] ?? '';
+        return $ref;
+    }
+}
+```
+
 **Sheet CRUD Controller** (`src/Controller/Admin/SheetCrudController.php`):
 ```php
 use App\Form\SheetReferenceType;
@@ -125,9 +182,13 @@ public function configureFields(string $pageName): iterable
 {
     // ... other fields
 
-    // References collection
+    // References collection with NEW v4.27.6 features! 🔥
     yield CollectionField::new('references')
         ->setEntryType(SheetReferenceType::class)
+
+        // NEW: Customize how items are displayed in lists!
+        ->setEntryToStringMethod('getDisplayString')  // Shows "[CATALOG] BW-123"
+
         ->setFormTypeOptions([
             'entry_options' => [
                 'label' => false,
@@ -141,6 +202,27 @@ public function configureFields(string $pageName): iterable
         ->setHelp('Add multiple reference codes (catalog numbers, publisher codes, etc.)')
         ->hideOnIndex();
 
+    // Display references in index view (now readable!)
+    yield Field::new('references')
+        ->formatValue(function ($value, $entity) {
+            if (!$value || !is_array($value)) {
+                return '<span class="text-muted">No references</span>';
+            }
+
+            $badges = array_map(function($ref) {
+                $refObj = is_array($ref)
+                    ? \App\DTO\SheetReference::fromArray($ref)
+                    : $ref;
+                return sprintf(
+                    '<span class="badge bg-info me-1">%s</span>',
+                    htmlspecialchars($refObj->getDisplayString())
+                );
+            }, $value);
+
+            return implode(' ', $badges);
+        })
+        ->onlyOnIndex();
+
     // Display references in detail view
     yield Field::new('references')
         ->setTemplatePath('admin/field/references_display.html.twig')
@@ -148,6 +230,16 @@ public function configureFields(string $pageName): iterable
 
     // ... other fields
 }
+```
+
+**Before v4.27.6** (what you would see):
+```
+References: SheetReference, SheetReference, SheetReference
+```
+
+**After v4.27.6** (with setEntryToStringMethod):
+```
+References: [CATALOG] BW-123 [PUBLISHER] PUB-456 [INTERNAL] INT-789
 ```
 
 **References Display Template** (`templates/admin/field/references_display.html.twig`):

@@ -102,7 +102,109 @@ public function configureFilters(Filters $filters): Filters
 
 ---
 
-### Story 7.2: Prepare Template for Difficulty + Status Filter (Live Coding)
+### Story 7.2: Add EntityFilter with Autocomplete (NEW in v4.27.3!) 🔥
+
+**Description**: Implement EntityFilter with autocomplete for composer and arranger - showcasing the latest EasyAdmin feature (November 2024).
+
+**Why This Matters**:
+- Demonstrates cutting-edge EasyAdmin features
+- Solves real-world performance problems
+- Shows modern Ajax/autocomplete integration
+- Perfect for audiences with large datasets
+
+**Tasks**:
+- [ ] Add EntityFilter with autocomplete for composer
+- [ ] Add EntityFilter with autocomplete for arranger
+- [ ] Add EntityFilter with autocomplete for organization (optional)
+- [ ] Test with realistic data (50+ composers)
+- [ ] Compare with old non-autocomplete behavior
+- [ ] Document the difference in talk notes
+
+**Technical Details**:
+
+**In SheetCrudController** (`src/Controller/Admin/SheetCrudController.php`):
+```php
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+
+public function configureFilters(Filters $filters): Filters
+{
+    return $filters
+        // Text filters
+        ->add('title')
+        ->add('genre')
+
+        // Custom filter
+        ->add(HasPdfFilter::new('pdfFileName', 'Has PDF File'))
+
+        // EntityFilter with autocomplete - NEW in v4.27.3! 🔥
+        ->add(EntityFilter::new('composer')
+            ->setLabel('Composer')
+            ->autocomplete()  // Ajax-powered autocomplete!
+        )
+        ->add(EntityFilter::new('arranger')
+            ->setLabel('Arranger')
+            ->autocomplete()  // Loads dynamically as you type
+        )
+
+        // Standard filters
+        ->add('difficulty')
+        ->add('status');
+}
+```
+
+**The Difference**:
+
+**Before v4.27.3** (without autocomplete):
+```php
+// This would load ALL composers at once
+->add(EntityFilter::new('composer'))
+// With 500 composers = slow page load, memory issues
+```
+
+**After v4.27.3** (with autocomplete):
+```php
+// Loads composers dynamically via Ajax
+->add(EntityFilter::new('composer')->autocomplete())
+// Fast even with 10,000+ composers!
+```
+
+**Demo Flow for Talk**:
+1. Show filter dropdown with autocomplete
+2. Type "Bach" - shows only matching composers
+3. Select composer - list filters instantly
+4. Mention: "This is new in EasyAdmin v4.27.3 - no more loading all entities!"
+5. Show it also works on forms (AssociationField uses TomSelect)
+
+**Talk Points**:
+- "This feature was just added in November 2024"
+- "Community requested it because EntityFilter was unusable with large datasets"
+- "Uses same TomSelect library as forms for consistency"
+- "Perfect example of EasyAdmin's active development"
+
+**Comparison with AssociationField**:
+| Feature | EntityFilter | AssociationField |
+|---------|-------------|------------------|
+| **Location** | Filter panel on list pages | Forms (create/edit) |
+| **Purpose** | Filter/search data | Select related entity |
+| **Autocomplete** | `->autocomplete()` (v4.27.3+) | Built-in (TomSelect) |
+| **Use Case** | "Show me sheets by Bach" | "This sheet's composer is Bach" |
+
+**Acceptance Criteria**:
+- EntityFilter with autocomplete works for composer
+- EntityFilter with autocomplete works for arranger
+- Typing in filter shows dynamic results
+- Performance is good with 50+ entities
+- Clear visual indication of autocomplete behavior
+
+**Deliverables**:
+- Updated SheetCrudController with EntityFilter autocomplete
+- Demo data with 50+ composers to showcase feature
+- Talk notes explaining the feature
+
+---
+
+### Story 7.3: Prepare Template for Difficulty + Status Filter (Live Coding)
 
 **Description**: Create a template/skeleton file for the filter that will be live-coded during the talk.
 
@@ -246,7 +348,7 @@ php bin/console cache:clear
 
 ---
 
-### Story 7.3: Implement Difficulty + Status Filter (Complete Version)
+### Story 7.4: Implement Difficulty + Status Filter (Complete Version)
 
 **Description**: Create the complete, working version of the filter for the safety net branch.
 
@@ -371,7 +473,7 @@ public function configureFilters(Filters $filters): Filters
 
 ---
 
-### Story 7.4: Create Additional Custom Filters (Optional)
+### Story 7.5: Create Additional Custom Filters (Optional)
 
 **Description**: Create more custom filters for demonstration variety.
 
@@ -505,7 +607,7 @@ class GenreKeyFilter implements FilterInterface
 
 ---
 
-### Story 7.5: Document Filter Pattern and Best Practices
+### Story 7.6: Document Filter Pattern and Best Practices
 
 **Description**: Create documentation explaining the custom filter pattern.
 
