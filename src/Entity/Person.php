@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PersonRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -21,12 +23,20 @@ class Person
     #[ORM\Column(length: 255, nullable: false)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 20, nullable: false)]
-    private ?string $type = null;
-
     #[ORM\ManyToOne(inversedBy: 'persons')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Organization $organization = null;
+
+    /**
+     * @var Collection<int, CreditedPerson>
+     */
+    #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'person', orphanRemoval: true)]
+    private Collection $credit;
+
+    public function __construct()
+    {
+        $this->credit = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -45,18 +55,6 @@ class Person
         return $this;
     }
 
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
     public function getOrganization(): ?Organization
     {
         return $this->organization;
@@ -65,6 +63,36 @@ class Person
     public function setOrganization(?Organization $organization): static
     {
         $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CreditedPerson>
+     */
+    public function getCredit(): Collection
+    {
+        return $this->credit;
+    }
+
+    public function addCredit(CreditedPerson $credit): static
+    {
+        if (!$this->credit->contains($credit)) {
+            $this->credit->add($credit);
+            $credit->setPerson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCredit(CreditedPerson $credit): static
+    {
+        if ($this->credit->removeElement($credit)) {
+            // set the owning side to null (unless already changed)
+            if ($credit->getPerson() === $this) {
+                $credit->setPerson(null);
+            }
+        }
 
         return $this;
     }

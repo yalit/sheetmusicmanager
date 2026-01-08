@@ -124,12 +124,12 @@ class Organization
 **Description**: Create the Person entity for composers and arrangers.
 
 **Tasks**:
-- [ ] Generate entity: `php bin/console make:entity Person`
-- [ ] Add fields: name, type
-- [ ] Add Timestampable and Blameable traits
-- [ ] Define relationship to Organization
-- [ ] Define inverse relationships to Sheet
-- [ ] Add validation constraints
+- [X] Generate entity: `php bin/console make:entity Person`
+- [X] Add fields: name, type
+- [X] Add Timestampable and Blameable traits
+- [X] Define relationship to Organization
+- [X] Define inverse relationships to Sheet
+- [X] Add validation constraints
 
 **Key Fields**:
 - `name`: string(255), NOT NULL
@@ -153,13 +153,13 @@ class Organization
 **Description**: Create the Sheet entity for music scores.
 
 **Tasks**:
-- [ ] Generate entity: `php bin/console make:entity Sheet`
-- [ ] Add fields: title, genre, difficulty, duration, key_signature, status, notes
-- [ ] Add file fields: pdf_file, cover_image
-- [ ] Add JSON field: references (array type)
-- [ ] Define relationships
-- [ ] Add Timestampable and Blameable
-- [ ] Add validation constraints
+- [X] Generate entity: `php bin/console make:entity Sheet`
+- [X] Add fields: title, genre, difficulty, duration, key_signature, status, notes
+- [X] Add file fields: pdf_file, cover_image
+- [X] Add JSON field: references (array type)
+- [X] Define relationships
+- [X] Add Timestampable and Blameable
+- [X] Add validation constraints
 
 **Key Fields**:
 - `title`: string(255), NOT NULL
@@ -193,10 +193,10 @@ class Organization
 **Description**: Create a Data Transfer Object for sheet references (not a database entity).
 
 **Tasks**:
-- [ ] Create DTO class
-- [ ] Add properties: reference_code, reference_type
-- [ ] Implement serialization for JSON storage
-- [ ] Add validation
+- [X] Create DTO class
+- [X] Add properties: reference_code, reference_type
+- [X] Implement serialization for JSON storage
+- [X] Add validation
 
 **DTO Code** (`src/DTO/SheetReference.php`):
 ```php

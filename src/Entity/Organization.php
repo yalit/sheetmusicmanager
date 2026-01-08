@@ -10,6 +10,7 @@ use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/** @package App\Entity */
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
 class Organization
 {
@@ -39,9 +40,23 @@ class Organization
     #[ORM\OneToMany(targetEntity: Person::class, mappedBy: 'organization', orphanRemoval: true)]
     private Collection $persons;
 
+    /**
+     * @var Collection<int, Sheet>
+     */
+    #[ORM\OneToMany(targetEntity: Sheet::class, mappedBy: 'organization', orphanRemoval: true)]
+    private Collection $sheets;
+
+    /**
+     * @var Collection<int, CreditedPerson>
+     */
+    #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'organization', orphanRemoval: true)]
+    private Collection $creditedPeople;
+
     public function __construct()
     {
         $this->persons = new ArrayCollection();
+        $this->sheets = new ArrayCollection();
+        $this->creditedPeople = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -114,6 +129,66 @@ class Organization
             // set the owning side to null (unless already changed)
             if ($person->getOrganization() === $this) {
                 $person->setOrganization(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sheet>
+     */
+    public function getSheets(): Collection
+    {
+        return $this->sheets;
+    }
+
+    public function addSheet(Sheet $sheet): static
+    {
+        if (!$this->sheets->contains($sheet)) {
+            $this->sheets->add($sheet);
+            $sheet->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSheet(Sheet $sheet): static
+    {
+        if ($this->sheets->removeElement($sheet)) {
+            // set the owning side to null (unless already changed)
+            if ($sheet->getOrganization() === $this) {
+                $sheet->setOrganization(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CreditedPerson>
+     */
+    public function getCreditedPeople(): Collection
+    {
+        return $this->creditedPeople;
+    }
+
+    public function addCreditedPerson(CreditedPerson $creditedPerson): static
+    {
+        if (!$this->creditedPeople->contains($creditedPerson)) {
+            $this->creditedPeople->add($creditedPerson);
+            $creditedPerson->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreditedPerson(CreditedPerson $creditedPerson): static
+    {
+        if ($this->creditedPeople->removeElement($creditedPerson)) {
+            // set the owning side to null (unless already changed)
+            if ($creditedPerson->getOrganization() === $this) {
+                $creditedPerson->setOrganization(null);
             }
         }
 
