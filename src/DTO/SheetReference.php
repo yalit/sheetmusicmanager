@@ -31,7 +31,7 @@ class SheetReference
     }
 
     /**
-    * @param $data Array<string, string>
+    * @param array<string, string> $data
     **/
     public static function fromArray(array $data): self
     {

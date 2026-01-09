@@ -23,7 +23,7 @@ class SetListItem
 
     #[ORM\ManyToOne(inversedBy: 'item')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?SetList $setlist = null;
+    private ?Setlist $setlist = null;
 
     #[ORM\ManyToOne(inversedBy: 'setlist')]
     #[ORM\JoinColumn(nullable: false)]
@@ -37,7 +37,7 @@ class SetListItem
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $notes = "";
+    private string $notes = "";
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -48,12 +48,12 @@ class SetListItem
         return $this->id;
     }
 
-    public function getSetlist(): ?SetList
+    public function getSetlist(): ?Setlist
     {
         return $this->setlist;
     }
 
-    public function setSetlist(?SetList $setlist): static
+    public function setSetlist(?Setlist $setlist): static
     {
         $this->setlist = $setlist;
 

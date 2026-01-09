@@ -11,23 +11,32 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BaseRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @param class-string<T> $entityClass
+     */
+    public function __construct(ManagerRegistry $registry, string $entityClass)
     {
-        parent::__construct($registry, Organization::class);
+        parent::__construct($registry, $entityClass);
     }
 
-    public function save(T $organization, bool $flush = false): void
+    /**
+     * @param T $entity
+     */
+    public function save(object $entity, bool $flush = false): void
     {
-        $this->getEntityManager()->persist($organization);
+        $this->getEntityManager()->persist($entity);
 
         if ($flush) {
             $this->getEntityManager()->flush();
         }
     }
 
-    public function delete(T $organization, bool $flush = false): void
+    /**
+     * @param T $entity
+     */
+    public function delete(object $entity, bool $flush = false): void
     {
-        $this->getEntityManager()->remove($organization);
+        $this->getEntityManager()->remove($entity);
 
         if ($flush) {
             $this->getEntityManager()->flush();

@@ -35,7 +35,7 @@ class Setlist
 
     #[ORM\Column(type: Types::TEXT)]
     #[NotNull]
-    private ?string $notes = "";
+    private string $notes = "";
 
     #[ORM\ManyToOne(inversedBy: 'setlists')]
     #[ORM\JoinColumn(nullable: false)]
@@ -82,7 +82,7 @@ class Setlist
         return $this;
     }
 
-    public function getNotes(): ?string
+    public function getNotes(): string
     {
         return $this->notes;
     }

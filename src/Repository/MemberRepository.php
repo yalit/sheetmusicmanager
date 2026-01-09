@@ -18,6 +18,10 @@ class MemberRepository extends BaseRepository implements PasswordUpgraderInterfa
     }
 
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void {
+        if (!$user instanceof Member) {
+            throw new \InvalidArgumentException('User must be an instance of Member');
+        }
+
         $user->setPassword($newHashedPassword);
         $this->save($user);
     }

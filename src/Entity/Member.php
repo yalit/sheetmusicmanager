@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Exception;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -49,7 +50,7 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     /**
-     * @var $roles string[]
+     * @var list<string>
      */
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
@@ -69,7 +70,13 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = null;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getUserIdentifier(): string {
+        if(null === $this->email || $this->email === '') {
+            throw new Exception("Member email shouldn't be null or empty");
+        }
         return $this->email;
     }
 
@@ -102,6 +109,18 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $password): static
+    {
+        $this->plainPassword = $password;
+
+        return $this;
+    }
+
     public function getPassword(): ?string
     {
         return $this->password;
@@ -115,19 +134,19 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     public function getRoles(): array
     {
-        if (array_find($this->roles, fn($role) => $role === static::DEFAULT_ROLE)) {
-            return array_merge([static::DEFAULT_ROLE], $this->roles);
+        $roles = $this->roles;
+        if (!in_array(static::DEFAULT_ROLE, $roles, true)) {
+            $roles[] = static::DEFAULT_ROLE;
         }
-
-        return $this->roles;
+        return $roles;
     }
 
     /**
-     * @param $roles string[]
+     * @param list<string> $roles
      */
     public function setRoles(array $roles): static
     {

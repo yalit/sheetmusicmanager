@@ -50,6 +50,9 @@ class Sheet
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
+    /**
+     * @var array<int, array<string, string>>
+     */
     #[ORM\Column(type: Types::JSON)]
     private array $refs = [];
 
@@ -157,19 +160,25 @@ class Sheet
     }
 
     /**
-     * @return SheetReference[]
+     * @return list<SheetReference>
      **/
     public function getRefs(): array
     {
-        return array_map(fn($ref) => SheetReference::fromArray($ref), $this->refs);
+        return array_values(array_map(
+            fn(array $ref): SheetReference => SheetReference::fromArray($ref),
+            $this->refs
+        ));
     }
 
     /**
-     * @param $refs SheetReference[]
+     * @param list<SheetReference> $refs
      **/
     public function setRefs(array $refs): static
     {
-        $this->refs = array_map(fn($ref) => $ref->toArray(), $refs);
+        $this->refs = array_map(
+            fn(SheetReference $ref): array => $ref->toArray(),
+            $refs
+        );
 
         return $this;
     }
