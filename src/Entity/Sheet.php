@@ -10,6 +10,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: SheetRepository::class)]
 class Sheet
@@ -23,18 +26,25 @@ class Sheet
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[NotBlank]
+    #[NotNull]
+    #[Length(min: 3, max: 255)]
     private ?string $title = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Length(min: 3, max: 100)]
     private ?string $genre = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Length(min: 3, max: 20)]
     private ?string $difficulty = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Length(max: 50)]
     private ?string $duration = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Length(max: 50)]
     private ?string $key_signature = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -44,6 +54,7 @@ class Sheet
     private array $refs = [];
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Length(max: 255)]
     private ?string $file = null;
 
     #[ORM\ManyToOne(inversedBy: 'sheets')]

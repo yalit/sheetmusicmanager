@@ -362,7 +362,6 @@ class SheetReference
 - [ ] Validation constraints added
 - [ ] Migrations generated and executed
 - [ ] Database indexes added
-- [ ] Custom repository methods implemented
 - [ ] Schema validation passes
 - [ ] No Doctrine errors
 
@@ -393,7 +392,6 @@ php bin/console doctrine:mapping:info | grep "App\\\Entity"
 - [ ] 1 DTO file in `src/DTO/`
 - [ ] Migration files in `migrations/`
 - [ ] Database schema created
-- [ ] Custom repository methods
 
 ---
 
