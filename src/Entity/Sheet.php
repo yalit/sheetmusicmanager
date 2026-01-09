@@ -56,9 +56,16 @@ class Sheet
     #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'sheet', orphanRemoval: true)]
     private Collection $credit;
 
+    /**
+     * @var Collection<int, SetListItem>
+     */
+    #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'sheet', orphanRemoval: true)]
+    private Collection $setlist;
+
     public function __construct()
     {
         $this->credit = new ArrayCollection();
+        $this->setlist = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -204,6 +211,36 @@ class Sheet
             // set the owning side to null (unless already changed)
             if ($credit->getSheet() === $this) {
                 $credit->setSheet(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SetListItem>
+     */
+    public function getSetlist(): Collection
+    {
+        return $this->setlist;
+    }
+
+    public function addSetlist(SetListItem $setlist): static
+    {
+        if (!$this->setlist->contains($setlist)) {
+            $this->setlist->add($setlist);
+            $setlist->setSheet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSetlist(SetListItem $setlist): static
+    {
+        if ($this->setlist->removeElement($setlist)) {
+            // set the owning side to null (unless already changed)
+            if ($setlist->getSheet() === $this) {
+                $setlist->setSheet(null);
             }
         }
 

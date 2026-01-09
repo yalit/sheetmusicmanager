@@ -287,12 +287,12 @@ class SheetReference
 **Description**: Create the SetlistItem join entity linking setlists to sheets.
 
 **Tasks**:
-- [ ] Generate entity: `php bin/console make:entity SetlistItem`
-- [ ] Add fields: position, name, notes
-- [ ] Define relationships to Setlist and Sheet
-- [ ] Add Timestampable (no Blameable)
-- [ ] Add unique constraint on (setlist_id, position)
-- [ ] Add validation constraints
+- [X] Generate entity: `php bin/console make:entity SetlistItem`
+- [X] Add fields: position, name, notes
+- [X] Define relationships to Setlist and Sheet
+- [X] Add Timestampable (no Blameable)
+- [X] Add unique constraint on (setlist_id, position)
+- [X] Add validation constraints
 
 **Key Fields**:
 - `position`: integer, NOT NULL

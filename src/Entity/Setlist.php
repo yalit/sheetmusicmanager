@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SetlistRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
@@ -38,6 +40,17 @@ class Setlist
     #[ORM\ManyToOne(inversedBy: 'setlists')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Organization $organization = null;
+
+    /**
+     * @var Collection<int, SetListItem>
+     */
+    #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'setlist', orphanRemoval: true)]
+    private Collection $item;
+
+    public function __construct()
+    {
+        $this->item = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -88,6 +101,36 @@ class Setlist
     public function setOrganization(?Organization $organization): static
     {
         $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SetListItem>
+     */
+    public function getItem(): Collection
+    {
+        return $this->item;
+    }
+
+    public function addItem(SetListItem $item): static
+    {
+        if (!$this->item->contains($item)) {
+            $this->item->add($item);
+            $item->setSetlist($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItem(SetListItem $item): static
+    {
+        if ($this->item->removeElement($item)) {
+            // set the owning side to null (unless already changed)
+            if ($item->getSetlist() === $this) {
+                $item->setSetlist(null);
+            }
+        }
 
         return $this;
     }
