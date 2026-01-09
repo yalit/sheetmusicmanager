@@ -256,11 +256,11 @@ class SheetReference
 **Description**: Create the Setlist entity for performance collections.
 
 **Tasks**:
-- [ ] Generate entity: `php bin/console make:entity Setlist`
-- [ ] Add fields: name, event_date, occasion, status, notes
-- [ ] Define relationships
-- [ ] Add Timestampable and Blameable
-- [ ] Add validation constraints
+- [X] Generate entity: `php bin/console make:entity Setlist`
+- [X] Add fields: name, event_date, occasion, status, notes
+- [X] Define relationships
+- [X] Add Timestampable and Blameable
+- [X] Add validation constraints
 
 **Key Fields**:
 - `name`: string(255), NOT NULL
