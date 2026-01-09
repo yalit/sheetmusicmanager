@@ -58,12 +58,19 @@ class Organization
     #[ORM\OneToMany(targetEntity: Setlist::class, mappedBy: 'organization', orphanRemoval: true)]
     private Collection $setlists;
 
+    /**
+     * @var Collection<int, Member>
+     */
+    #[ORM\ManyToMany(targetEntity: Member::class, mappedBy: 'organizations')]
+    private Collection $members;
+
     public function __construct()
     {
         $this->persons = new ArrayCollection();
         $this->sheets = new ArrayCollection();
         $this->creditedPeople = new ArrayCollection();
         $this->setlists = new ArrayCollection();
+        $this->members = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -227,6 +234,33 @@ class Organization
             if ($setlist->getOrganization() === $this) {
                 $setlist->setOrganization(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Member>
+     */
+    public function getMembers(): Collection
+    {
+        return $this->members;
+    }
+
+    public function addMember(Member $member): static
+    {
+        if (!$this->members->contains($member)) {
+            $this->members->add($member);
+            $member->addOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMember(Member $member): static
+    {
+        if ($this->members->removeElement($member)) {
+            $member->removeOrganization($this);
         }
 
         return $this;
