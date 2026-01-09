@@ -45,6 +45,7 @@ class Setlist
      * @var Collection<int, SetListItem>
      */
     #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'setlist', orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $item;
 
     public function __construct()
@@ -133,5 +134,10 @@ class Setlist
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->title ?? '';
     }
 }

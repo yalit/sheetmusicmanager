@@ -119,4 +119,9 @@ class SetListItem
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->name ?? "Position {$this->position}";
+    }
 }

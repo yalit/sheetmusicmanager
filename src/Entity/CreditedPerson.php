@@ -85,4 +85,9 @@ class CreditedPerson
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return "{$this->person?->getName()} ({$this->type})";
+    }
 }
