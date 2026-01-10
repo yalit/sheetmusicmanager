@@ -45,8 +45,6 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $plainPassword = null;
 
     #[ORM\Column(length: 255)]
-    #[NotNull]
-    #[NotBlank]
     private ?string $password = null;
 
     /**
