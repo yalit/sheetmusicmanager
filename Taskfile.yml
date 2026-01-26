@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+vars:
+    SYMFONY: symfony
+    CONSOLE: symfony console
+
+tasks:
+    default:
+        desc: List available tasks
+        cmds:
+            - task --list
+        silent: true
+
+    # Server
+    up:
+        desc: Bring the server up
+        cmds:
+            - "{{.SYMFONY}} serve -d"
+
+    down:
+        desc: Bring the server down
+        cmds:
+            - "{{.SYMFONY}} server:stop"
+
+    # DB
+    migrations:
+        desc: Create migrations
+        cmds:
+            - "{{.CONSOLE}} make:migration"
+
+    migrate:
+        desc: Execute the pending migrations
+        cmds:
+            - "{{.CONSOLE}} d:m:m"
+
+    # Test
+    test-init:
+        desc: Init test environment
+        cmds:
+            - rm -f var/data_test.db
+            - "{{.CONSOLE}} d:m:m --env=test --no-interaction"
+
+    tests:
+        desc: Run tests
+        cmds:
+            - bin/phpunit --testdox
