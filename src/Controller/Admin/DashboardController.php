@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Member;
 use App\Entity\Organization;
+use App\Entity\Sheet;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -32,5 +33,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Administration');
         yield MenuItem::linkToCrud('Organizations', 'fa fa-building', Organization::class);
         yield MenuItem::linkToCrud('Members', 'fa fa-users', Member::class);
+
+        yield MenuItem::section('Partitions');
+        yield MenuItem::linkToCrud('Sheets', 'fa fa-music', Sheet::class);
     }
 }
