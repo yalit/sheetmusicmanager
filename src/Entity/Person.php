@@ -23,10 +23,6 @@ class Person
     #[ORM\Column(length: 255, nullable: false)]
     private ?string $name = null;
 
-    #[ORM\ManyToOne(inversedBy: 'persons')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
-
     /**
      * @var Collection<int, CreditedPerson>
      */
@@ -51,18 +47,6 @@ class Person
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
 
         return $this;
     }

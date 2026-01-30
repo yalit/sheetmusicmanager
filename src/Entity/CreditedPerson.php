@@ -21,10 +21,6 @@ class CreditedPerson
     #[ORM\Column(length: 100)]
     private ?string $type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'creditedPeople')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
-
     #[ORM\ManyToOne(inversedBy: 'credit')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Sheet $sheet = null;
@@ -46,18 +42,6 @@ class CreditedPerson
     public function setType(string $type): static
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
 
         return $this;
     }

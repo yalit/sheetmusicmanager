@@ -39,10 +39,6 @@ class SetListItem
     #[ORM\Column(type: Types::TEXT)]
     private string $notes = "";
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -104,18 +100,6 @@ class SetListItem
     public function setNotes(string $notes): static
     {
         $this->notes = $notes;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
 
         return $this;
     }

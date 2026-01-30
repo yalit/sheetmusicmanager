@@ -53,17 +53,6 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
-    /**
-     * @var Collection<int, Organization>
-     */
-    #[ORM\ManyToMany(targetEntity: Organization::class, inversedBy: 'members')]
-    private Collection $organizations;
-
-    public function __construct()
-    {
-        $this->organizations = new ArrayCollection();
-    }
-
     public function eraseCredentials(): void {
         $this->plainPassword = null;
     }
@@ -149,30 +138,6 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Organization>
-     */
-    public function getOrganizations(): Collection
-    {
-        return $this->organizations;
-    }
-
-    public function addOrganization(Organization $organization): static
-    {
-        if (!$this->organizations->contains($organization)) {
-            $this->organizations->add($organization);
-        }
-
-        return $this;
-    }
-
-    public function removeOrganization(Organization $organization): static
-    {
-        $this->organizations->removeElement($organization);
 
         return $this;
     }

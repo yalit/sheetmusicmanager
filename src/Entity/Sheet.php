@@ -60,9 +60,9 @@ class Sheet
     #[Length(max: 255)]
     private ?string $file = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sheets')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Length(max: 255)]
+    private ?string $fullPath = null;
 
     /**
      * @var Collection<int, CreditedPerson>
@@ -195,18 +195,6 @@ class Sheet
         return $this;
     }
 
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, CreditedPerson>
      */
@@ -270,5 +258,15 @@ class Sheet
     public function __toString(): string
     {
         return $this->title ?? '';
+    }
+
+    public function getFullPath(): ?string
+    {
+        return $this->fullPath;
+    }
+
+    public function setFullPath(?string $fullPath): void
+    {
+        $this->fullPath = $fullPath;
     }
 }
