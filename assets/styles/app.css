@@ -1,3 +1,54 @@
-body {
-    background-color: skyblue;
+#app_pdf_field {
+    input[type=file] {
+    }
+
+    .loaded_files_header {
+        margin-top: 8px;
+        font-weight: bold;
+    }
+
+    .loaded_files_empty {
+        margin: 4px 0 0 24px;
+        color: #6c757d;
+        font-size: 0.85em;
+        font-style: italic;
+    }
+
+    .loaded_files,
+    .loaded_files_existing {
+        list-style: none;
+        margin: 4px 0 0 24px;
+        padding: 0;
+    }
+
+    .loaded_file {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        line-height: 1.4;
+    }
+
+    .loaded_file__remove {
+        color: #dc3545;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .loaded_file__remove:hover {
+        color: #a71d2a;
+    }
+
+    .loaded_file__size {
+        color: #6c757d;
+        font-size: 0.85em;
+    }
+
+    .loaded_file__link {
+        text-decoration: none;
+    }
+
+    .loaded_file__link:hover {
+        text-decoration: underline;
+    }
 }
