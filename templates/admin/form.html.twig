@@ -1,0 +1,36 @@
+{% macro file_row() %}
+    <li class="loaded_file">
+        <span data-file-remove="__FILENAME__" class="loaded_file__remove">&times;</span>
+        <span class="loaded_file__name">__FILENAME__</span>
+        <span class="loaded_file__size">(__FILESIZE__)</span>
+    </li>
+{% endmacro %}
+
+{% block app_pdf_field_widget %}
+    {% set existing_files = existing_files|default([]) %}
+    <div id="app_pdf_field">
+        {{ form_widget(form, {id:"app_pdf_field_input"}) }}
+        <div class="loaded_files_header">Fichiers</div>
+        {% if existing_files is not empty %}
+            <ul class="loaded_files_existing">
+                {% for file in existing_files %}
+                    <li class="loaded_file">
+                        <span data-existing-remove="{{ file.name }}" class="loaded_file__remove">&times;</span>
+                        <a href="{{ file.web_path }}" target="_blank" class="loaded_file__name loaded_file__link">{{ file.name }}</a>
+                        <span class="loaded_file__size">({{ file.size }})</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <p class="loaded_files_empty" {% if existing_files is not empty %}style="display: none"{% endif %}>Pas de fichiers</p>
+        <ul class="loaded_files" style="display: none">
+        </ul>
+        <input type="hidden" id="app_pdf_field_kept" name="app_pdf_field_kept"
+               value="{{ existing_files|map(f => f.name)|json_encode|e('html_attr') }}">
+        <input type="hidden" id="app_pdf_field_removed" name="app_pdf_field_removed"
+               value="{{ []|json_encode|e('html_attr') }}">
+    </div>
+    <template id="pdf_field_file">
+        {{ _self.file_row() }}
+    </template>
+{% endblock %}

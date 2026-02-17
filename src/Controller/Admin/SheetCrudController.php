@@ -2,26 +2,31 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @extends AbstractCrudController<Sheet>
  */
 class SheetCrudController extends AbstractCrudController
 {
+    private string $uploadDir = "public/uploads/sheets";
+
     public function __construct(
-        private SluggerInterface $slugger,
-    ) {
+        private readonly RequestStack $requestStack,
+        private readonly Filesystem   $filesystem,
+        private readonly string       $projectDir,
+    )
+    {
     }
 
     public static function getEntityFqcn(): string
@@ -32,64 +37,55 @@ class SheetCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->hideOnForm();
-        yield TextField::new('title', 'Titre');
-        yield AssociationField::new('organization', 'Organisation');
+        yield FormField::addColumn(8);
+        yield FormField::addPanel("General");
+        yield TextField::new('title', 'Titre')->setColumns(8);
+
+        yield PDFField::new('files', 'Fichier PDF')
+            ->setUploadDir($this->uploadDir)
+            ->setRequired($pageName === Crud::PAGE_NEW)
+            ;
+
+        yield FormField::addColumn(4);
+        yield FormField::addPanel("Details");
         yield TextField::new('genre');
         yield TextField::new('difficulty', 'Difficulté');
         yield TextField::new('duration', 'Durée');
         yield TextField::new('keySignature', 'Tonalité');
-        yield Field::new('file', 'Fichier PDF')
-            ->setFormType(FileType::class)
-            ->setFormTypeOption('mapped', false)
-            ->setFormTypeOption('required', false)
-            ->setFormTypeOption('attr', ['accept' => 'application/pdf'])
-            ->onlyOnForms();
-        yield TextField::new('file', 'Fichier PDF')
-            ->hideOnForm();
+
+        yield FormField::addPanel("Details");
         yield TextareaField::new('notes')
+            ->setNumOfRows(5)
             ->hideOnIndex();
-        yield AssociationField::new('credit', 'Crédits')
-            ->hideOnForm();
     }
 
     /**
      * @param Sheet $entityInstance
      */
-    public function persistEntity(\Doctrine\ORM\EntityManagerInterface $entityManager, mixed $entityInstance): void
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $this->handleFileUpload($entityInstance);
-        parent::persistEntity($entityManager, $entityInstance);
-    }
+        $request = $this->requestStack->getCurrentRequest();
+        $kept = $request?->request->get('app_pdf_field_kept', '[]');
+        $removed = $request?->request->get('app_pdf_field_removed', '[]');
+        if (!is_string($kept) || !is_string($removed)) {
+            return;
+        }
 
-    /**
-     * @param Sheet $entityInstance
-     */
-    public function updateEntity(\Doctrine\ORM\EntityManagerInterface $entityManager, mixed $entityInstance): void
-    {
-        $this->handleFileUpload($entityInstance);
+        $oldFiles = $entityInstance->getFiles();
+
+        /** @var string[] $keptFiles */
+        $keptFiles = json_decode($kept, true) ?: [];
+        /** @var string[] $removedFiles */
+        $removedFiles = json_decode($removed, true) ?: [];
+        $newFiles = $entityInstance->getFiles();
+
+        foreach ($removedFiles as $filename) {
+            $fullPath = $this->projectDir . DIRECTORY_SEPARATOR . $this->uploadDir . DIRECTORY_SEPARATOR . $filename;
+            $this->filesystem->remove($fullPath);
+        }
+
+        $entityInstance->setFiles(array_merge($keptFiles, $newFiles));
+
         parent::updateEntity($entityManager, $entityInstance);
-    }
-
-    private function handleFileUpload(Sheet $sheet): void
-    {
-        $request = $this->getContext()?->getRequest();
-        if ($request === null) {
-            return;
-        }
-
-        $sheetFiles = $request->files->get('Sheet');
-        if (!is_array($sheetFiles) || !isset($sheetFiles['file'])) {
-            return;
-        }
-
-        $file = $sheetFiles['file'];
-        if (!$file instanceof UploadedFile) {
-            return;
-        }
-
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $this->slugger->slug($originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $sheet->setFile($newFilename);
     }
 }
