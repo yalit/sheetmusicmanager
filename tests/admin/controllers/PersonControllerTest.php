@@ -3,20 +3,20 @@
 namespace App\Tests\admin\controllers;
 
 use App\Controller\Admin\DashboardController;
-use App\Controller\Admin\OrganizationCrudController;
+use App\Controller\Admin\PersonCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Test\AbstractCrudTestCase;
 use EasyCorp\Bundle\EasyAdminBundle\Test\Trait\CrudTestFormAsserts;
 
 /**
- * @extends AbstractCrudTestCase<OrganizationCrudController>
+ * @extends AbstractCrudTestCase<PersonCrudController>
  */
-final class OrganizationControllerTest extends AbstractCrudTestCase
+final class PersonControllerTest extends AbstractCrudTestCase
 {
     use CrudTestFormAsserts;
 
     protected function getControllerFqcn(): string
     {
-        return OrganizationCrudController::class;
+        return PersonCrudController::class;
     }
 
     protected function getDashboardFqcn(): string

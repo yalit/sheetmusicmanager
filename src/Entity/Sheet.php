@@ -56,9 +56,11 @@ class Sheet
     #[ORM\Column(type: Types::JSON)]
     private array $refs = [];
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Length(max: 255)]
-    private ?string $file = null;
+    /**
+     * @var string[]
+     */
+    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    private array $files = [];
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Length(max: 255)]
@@ -183,14 +185,21 @@ class Sheet
         return $this;
     }
 
-    public function getFile(): ?string
+    /**
+     * @return string[]
+     */
+    public function getFiles(): array
     {
-        return $this->file;
+        return $this->files;
     }
 
-    public function setFile(?string $file): static
+    /**
+     * @param string[]|null $files
+     * @return $this
+     */
+    public function setFiles(?array $files): static
     {
-        $this->file = $file;
+        $this->files = $files ?? [];
 
         return $this;
     }
@@ -258,6 +267,14 @@ class Sheet
     public function __toString(): string
     {
         return $this->title ?? '';
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getUploadedFiles(): array
+    {
+        return $this->files;
     }
 
     public function getFullPath(): ?string

@@ -23,6 +23,5 @@ class MemberCrudController extends AbstractCrudController
             ->setRequired($pageName === "new")
             ->setHelp($pageName === "edit" ? "Remplir en cas de changement..." : "")
         ;
-        yield AssociationField::new('organizations');
     }
 }

@@ -7,6 +7,8 @@ use App\Entity\Organization;
 use App\Entity\Person;
 use App\Entity\Sheet;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -18,13 +20,28 @@ class DashboardController extends AbstractDashboardController
 {
     public function index(): Response
     {
-        return $this->redirectToRoute("admin_organization_index");
+        return $this->redirectToRoute("admin_sheet_index");
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Sheetmusic Manager');
+            ->setTitle('Sheetmusic Manager')
+        ;
+    }
+
+    public function configureCrud(): Crud
+    {
+        $crud = parent::configureCrud();
+
+        return $crud->setFormThemes(['admin/form.html.twig', '@EasyAdmin/crud/form_theme.html.twig']);
+    }
+
+    public function configureAssets(): Assets
+    {
+        $assets = parent::configureAssets();
+
+        return $assets->addAssetMapperEntry('app');
     }
 
     public function configureMenuItems(): iterable
