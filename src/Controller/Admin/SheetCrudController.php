@@ -49,9 +49,6 @@ class SheetCrudController extends AbstractCrudController
         yield FormField::addColumn(4);
         yield FormField::addPanel("Details");
         yield TextField::new('genre');
-        yield TextField::new('difficulty', 'Difficulté');
-        yield TextField::new('duration', 'Durée');
-        yield TextField::new('keySignature', 'Tonalité');
 
         yield FormField::addPanel("Details");
         yield TextareaField::new('notes')

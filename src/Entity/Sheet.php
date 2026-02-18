@@ -35,18 +35,6 @@ class Sheet
     #[Length(min: 3, max: 100)]
     private ?string $genre = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
-    #[Length(min: 3, max: 20)]
-    private ?string $difficulty = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Length(max: 50)]
-    private ?string $duration = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Length(max: 50)]
-    private ?string $key_signature = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
@@ -109,42 +97,6 @@ class Sheet
     public function setGenre(?string $genre): static
     {
         $this->genre = $genre;
-
-        return $this;
-    }
-
-    public function getDifficulty(): ?string
-    {
-        return $this->difficulty;
-    }
-
-    public function setDifficulty(?string $difficulty): static
-    {
-        $this->difficulty = $difficulty;
-
-        return $this;
-    }
-
-    public function getDuration(): ?string
-    {
-        return $this->duration;
-    }
-
-    public function setDuration(?string $duration): static
-    {
-        $this->duration = $duration;
-
-        return $this;
-    }
-
-    public function getKeySignature(): ?string
-    {
-        return $this->key_signature;
-    }
-
-    public function setKeySignature(?string $key_signature): static
-    {
-        $this->key_signature = $key_signature;
 
         return $this;
     }
