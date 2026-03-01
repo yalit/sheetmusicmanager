@@ -14,6 +14,7 @@ const get_autocomplete_data = (elem) => {
 const init_autocomplete = (elem) => {
     const data = get_autocomplete_data(elem)
     const items = elem.value.split(data.separator)
+    console.log(data.choices)
     const choices = Array.from(new Set(data.choices.concat(items))).sort().filter(v => v !== "")
     const options = choices.map(s => ({value: s, text: s}))
 

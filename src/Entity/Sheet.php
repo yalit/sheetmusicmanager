@@ -30,9 +30,11 @@ class Sheet
     #[Length(min: 3, max: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 100, nullable: true)]
-    #[Length(min: 3, max: 100)]
-    private ?string $genre = null;
+    /**
+     * @var string[]
+     */
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    private array $tags = [];
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
@@ -88,14 +90,20 @@ class Sheet
         return $this;
     }
 
-    public function getGenre(): ?string
+    /**
+     * @return string[]
+     */
+    public function getTags(): array
     {
-        return $this->genre;
+        return $this->tags;
     }
 
-    public function setGenre(?string $genre): static
+    /**
+     * @param string[] $tags
+     */
+    public function setTags(array $tags): static
     {
-        $this->genre = $genre;
+        $this->tags = $tags;
 
         return $this;
     }

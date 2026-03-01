@@ -8,6 +8,7 @@ use App\Entity\Sheet;
 use App\Repository\SheetRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -54,9 +55,8 @@ class SheetCrudController extends AbstractCrudController
         yield ChoiceAutoCompleteStringField::new('refs')
             ->setChoices([$this->sheetRepository, 'getAllRefs'])
         ;
-        yield ChoiceAutoCompleteStringField::new('genre')
-            ->setChoices([$this->sheetRepository, 'getAllGenres'])
-            ->allowMutiple(false)
+        yield ChoiceAutoCompleteStringField::new('tags')
+            ->setChoices([$this->sheetRepository, 'getAllTags'])
         ;
 
         yield FormField::addPanel("Details");
