@@ -2,8 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Fields\ChoiceAutoCompleteStringField;
 use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
+use App\Repository\SheetRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -22,6 +24,7 @@ class SheetCrudController extends AbstractCrudController
     private string $uploadDir = "public/uploads/sheets";
 
     public function __construct(
+        private readonly SheetRepository $sheetRepository,
         private readonly RequestStack $requestStack,
         private readonly Filesystem   $filesystem,
         private readonly string       $projectDir,
@@ -48,7 +51,13 @@ class SheetCrudController extends AbstractCrudController
 
         yield FormField::addColumn(4);
         yield FormField::addPanel("Details");
-        yield TextField::new('genre');
+        yield ChoiceAutoCompleteStringField::new('refs')
+            ->setChoices([$this->sheetRepository, 'getAllRefs'])
+        ;
+        yield ChoiceAutoCompleteStringField::new('genre')
+            ->setChoices([$this->sheetRepository, 'getAllGenres'])
+            ->allowMutiple(false)
+        ;
 
         yield FormField::addPanel("Details");
         yield TextareaField::new('notes')

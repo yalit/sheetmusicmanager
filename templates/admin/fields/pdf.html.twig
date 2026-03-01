@@ -2,6 +2,8 @@
 {# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
 {# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
 
-{% for name in field.value %}
-    <p>{{ name }}</p>
-{% endfor %}
+<div>
+    {% for name in field.value %}
+        <div>{{ name }}</div>
+    {% endfor %}
+</div>

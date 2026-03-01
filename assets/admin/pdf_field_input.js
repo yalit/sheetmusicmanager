@@ -1,3 +1,4 @@
+//TODO : load it only when pdf_input is present...
 const pdf_input = document.getElementById("app_pdf_field_input")
 const container = pdf_input.parentElement
 const loadedFileHolder = container.getElementsByClassName("loaded_files")[0]

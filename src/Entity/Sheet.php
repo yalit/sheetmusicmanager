@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\DTO\SheetReference;
 use App\Repository\SheetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,9 +38,9 @@ class Sheet
     private ?string $notes = null;
 
     /**
-     * @var array<int, array<string, string>>
+     * @var string[]
      */
-    #[ORM\Column(type: Types::JSON)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private array $refs = [];
 
     /**
@@ -114,25 +113,19 @@ class Sheet
     }
 
     /**
-     * @return list<SheetReference>
-     **/
+     * @return string[]
+     */
     public function getRefs(): array
     {
-        return array_values(array_map(
-            fn(array $ref): SheetReference => SheetReference::fromArray($ref),
-            $this->refs
-        ));
+        return $this->refs;
     }
 
     /**
-     * @param list<SheetReference> $refs
-     **/
+     * @param string[] $refs
+     */
     public function setRefs(array $refs): static
     {
-        $this->refs = array_map(
-            fn(SheetReference $ref): array => $ref->toArray(),
-            $refs
-        );
+        $this->refs = $refs;
 
         return $this;
     }

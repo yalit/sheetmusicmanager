@@ -34,3 +34,15 @@
         {{ _self.file_row() }}
     </template>
 {% endblock %}
+
+
+
+{% block app_autocomplete_widget %}
+    {{ form_widget(form, {'attr': {
+        'autocomplete': true,
+        'data-choices': form.vars.choices | json_encode,
+        'data-separator': form.vars.separator ?? ',',
+        'data-create': form.vars.create ?? '',
+        'data-multiple': form.vars.multiple ?? ''
+    }}) }}
+{% endblock %}
