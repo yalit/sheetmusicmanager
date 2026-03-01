@@ -34,7 +34,10 @@ class DashboardController extends AbstractDashboardController
     {
         $crud = parent::configureCrud();
 
-        return $crud->setFormThemes(['admin/form.html.twig', '@EasyAdmin/crud/form_theme.html.twig']);
+        return $crud
+            ->setFormThemes(['admin/form.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
+            ->renderContentMaximized()
+        ;
     }
 
     public function configureAssets(): Assets
