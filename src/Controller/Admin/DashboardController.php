@@ -52,7 +52,8 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::section('Administration');
-        yield MenuItem::linkToCrud('Members', 'fa fa-users', Member::class);
+        yield MenuItem::linkToCrud('Members', 'fa fa-users', Member::class)
+            ->setPermission('ROLE_LIBRARIAN');
 
         yield MenuItem::section('Partitions');
         yield MenuItem::linkToCrud('Person Types', 'fa fa-tags', PersonType::class);
