@@ -1,80 +1,83 @@
-//TODO : load it only when pdf_input is present...
-const pdf_input = document.getElementById("app_pdf_field_input")
-const container = pdf_input.parentElement
-const loadedFileHolder = container.getElementsByClassName("loaded_files")[0]
-const existingFileHolder = container.getElementsByClassName("loaded_files_existing")[0] ?? null
-const emptyMessage = container.getElementsByClassName("loaded_files_empty")[0]
-const keptInput = document.getElementById("app_pdf_field_kept")
-const removedInput = document.getElementById("app_pdf_field_removed")
-const template = document.getElementById("pdf_field_file")
+class PdfFieldInput {
+    constructor(container) {
+        this.input = container.querySelector('#app_pdf_field_input')
+        this.loadedFileHolder = container.querySelector('.loaded_files')
+        this.existingFileHolder = container.querySelector('.loaded_files_existing')
+        this.emptyMessage = container.querySelector('.loaded_files_empty')
+        this.keptInput = container.querySelector('#app_pdf_field_kept')
+        this.removedInput = container.querySelector('#app_pdf_field_removed')
+        this.template = document.getElementById('pdf_field_file')
+        this.managedFiles = []
 
-let managedFiles = []
-
-function formatFileSize(bytes) {
-    if (bytes < 1024) return bytes + ' o'
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko'
-    return (bytes / (1024 * 1024)).toFixed(1) + ' Mo'
-}
-
-function syncInputFiles() {
-    const dt = new DataTransfer()
-    managedFiles.forEach(f => dt.items.add(f))
-    pdf_input.files = dt.files
-}
-
-function updateEmptyMessage() {
-    const existingCount = existingFileHolder
-        ? existingFileHolder.querySelectorAll(".loaded_file").length
-        : 0
-    const hasFiles = managedFiles.length > 0 || existingCount > 0
-    emptyMessage.style.display = hasFiles ? "none" : ""
-    loadedFileHolder.style.display = managedFiles.length > 0 ? "" : "none"
-}
-
-function renderFileList() {
-    loadedFileHolder.innerHTML = ""
-
-    managedFiles.forEach(file => {
-        const clone = template.content.cloneNode(true)
-        clone.firstElementChild.outerHTML =
-            clone.firstElementChild.outerHTML
-                .replace(/__FILENAME__/g, file.name)
-                .replace(/__FILESIZE__/g, formatFileSize(file.size))
-        loadedFileHolder.appendChild(clone)
-    })
-
-    loadedFileHolder.querySelectorAll("[data-file-remove]").forEach(el => {
-        el.addEventListener("click", () => {
-            managedFiles = managedFiles.filter(f => f.name !== el.dataset.fileRemove)
-            syncInputFiles()
-            renderFileList()
+        this.input.addEventListener('change', () => {
+            this.managedFiles.push(...this.input.files)
+            this.syncInputFiles()
+            this.renderFileList()
         })
-    })
 
-    updateEmptyMessage()
-}
+        this.existingFileHolder?.querySelectorAll('[data-existing-remove]').forEach(el => {
+            el.addEventListener('click', () => {
+                el.closest('.loaded_file').remove()
+                let kept = JSON.parse(this.keptInput.value)
+                kept = kept.filter(name => name !== el.dataset.existingRemove)
+                this.keptInput.value = JSON.stringify(kept)
 
-// Handle existing file removal
-if (existingFileHolder) {
-    existingFileHolder.querySelectorAll("[data-existing-remove]").forEach(el => {
-        el.addEventListener("click", () => {
-            el.closest(".loaded_file").remove()
-            let kept = JSON.parse(keptInput.value)
-            kept = kept.filter(name => name !== el.dataset.existingRemove)
-            keptInput.value = JSON.stringify(kept)
-
-            let removed = JSON.parse(removedInput.value)
-            removed.push(el.dataset.existingRemove)
-            removedInput.value = JSON.stringify(removed)
-            updateEmptyMessage()
+                let removed = JSON.parse(this.removedInput.value)
+                removed.push(el.dataset.existingRemove)
+                this.removedInput.value = JSON.stringify(removed)
+                this.updateEmptyMessage()
+            })
         })
-    })
+
+        this.updateEmptyMessage()
+    }
+
+    formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' o'
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko'
+        return (bytes / (1024 * 1024)).toFixed(1) + ' Mo'
+    }
+
+    syncInputFiles() {
+        const dt = new DataTransfer()
+        this.managedFiles.forEach(f => dt.items.add(f))
+        this.input.files = dt.files
+    }
+
+    updateEmptyMessage() {
+        const existingCount = this.existingFileHolder
+            ? this.existingFileHolder.querySelectorAll('.loaded_file').length
+            : 0
+        const hasFiles = this.managedFiles.length > 0 || existingCount > 0
+        this.emptyMessage.style.display = hasFiles ? 'none' : ''
+        this.loadedFileHolder.style.display = this.managedFiles.length > 0 ? '' : 'none'
+    }
+
+    renderFileList() {
+        this.loadedFileHolder.innerHTML = ''
+
+        this.managedFiles.forEach(file => {
+            const clone = this.template.content.cloneNode(true)
+            clone.firstElementChild.outerHTML =
+                clone.firstElementChild.outerHTML
+                    .replace(/__FILENAME__/g, file.name)
+                    .replace(/__FILESIZE__/g, this.formatFileSize(file.size))
+            this.loadedFileHolder.appendChild(clone)
+        })
+
+        this.loadedFileHolder.querySelectorAll('[data-file-remove]').forEach(el => {
+            el.addEventListener('click', () => {
+                this.managedFiles = this.managedFiles.filter(f => f.name !== el.dataset.fileRemove)
+                this.syncInputFiles()
+                this.renderFileList()
+            })
+        })
+
+        this.updateEmptyMessage()
+    }
 }
 
-pdf_input.addEventListener("change", () => {
-    managedFiles.push(...pdf_input.files)
-    syncInputFiles()
-    renderFileList()
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('app_pdf_field')
+    if (container) new PdfFieldInput(container)
 })
-
-updateEmptyMessage()
