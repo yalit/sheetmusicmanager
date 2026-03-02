@@ -18,12 +18,9 @@ class CreditedPerson
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $type = null;
-
-    #[ORM\ManyToOne(inversedBy: 'creditedPeople')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
+    private ?PersonType $personType = null;
 
     #[ORM\ManyToOne(inversedBy: 'credit')]
     #[ORM\JoinColumn(nullable: false)]
@@ -38,26 +35,14 @@ class CreditedPerson
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getPersonType(): ?PersonType
     {
-        return $this->type;
+        return $this->personType;
     }
 
-    public function setType(string $type): static
+    public function setPersonType(?PersonType $personType): static
     {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
+        $this->personType = $personType;
 
         return $this;
     }
@@ -88,6 +73,6 @@ class CreditedPerson
 
     public function __toString(): string
     {
-        return "{$this->person?->getName()} ({$this->type})";
+        return "{$this->person?->getName()} ({$this->personType?->getName()})";
     }
 }

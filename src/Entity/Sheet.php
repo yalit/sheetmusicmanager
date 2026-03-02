@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\DTO\SheetReference;
 use App\Repository\SheetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -31,43 +30,35 @@ class Sheet
     #[Length(min: 3, max: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 100, nullable: true)]
-    #[Length(min: 3, max: 100)]
-    private ?string $genre = null;
-
-    #[ORM\Column(length: 20, nullable: true)]
-    #[Length(min: 3, max: 20)]
-    private ?string $difficulty = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Length(max: 50)]
-    private ?string $duration = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Length(max: 50)]
-    private ?string $key_signature = null;
+    /**
+     * @var string[]
+     */
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    private array $tags = [];
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
     /**
-     * @var array<int, array<string, string>>
+     * @var string[]
      */
-    #[ORM\Column(type: Types::JSON)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private array $refs = [];
+
+    /**
+     * @var string[]
+     */
+    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    private array $files = [];
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Length(max: 255)]
-    private ?string $file = null;
-
-    #[ORM\ManyToOne(inversedBy: 'sheets')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
+    private ?string $fullPath = null;
 
     /**
      * @var Collection<int, CreditedPerson>
      */
-    #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'sheet', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'sheet', cascade: ['persist'], orphanRemoval: true)]
     private Collection $credit;
 
     /**
@@ -99,50 +90,20 @@ class Sheet
         return $this;
     }
 
-    public function getGenre(): ?string
+    /**
+     * @return string[]
+     */
+    public function getTags(): array
     {
-        return $this->genre;
+        return $this->tags;
     }
 
-    public function setGenre(?string $genre): static
+    /**
+     * @param string[] $tags
+     */
+    public function setTags(array $tags): static
     {
-        $this->genre = $genre;
-
-        return $this;
-    }
-
-    public function getDifficulty(): ?string
-    {
-        return $this->difficulty;
-    }
-
-    public function setDifficulty(?string $difficulty): static
-    {
-        $this->difficulty = $difficulty;
-
-        return $this;
-    }
-
-    public function getDuration(): ?string
-    {
-        return $this->duration;
-    }
-
-    public function setDuration(?string $duration): static
-    {
-        $this->duration = $duration;
-
-        return $this;
-    }
-
-    public function getKeySignature(): ?string
-    {
-        return $this->key_signature;
-    }
-
-    public function setKeySignature(?string $key_signature): static
-    {
-        $this->key_signature = $key_signature;
+        $this->tags = $tags;
 
         return $this;
     }
@@ -160,49 +121,38 @@ class Sheet
     }
 
     /**
-     * @return list<SheetReference>
-     **/
+     * @return string[]
+     */
     public function getRefs(): array
     {
-        return array_values(array_map(
-            fn(array $ref): SheetReference => SheetReference::fromArray($ref),
-            $this->refs
-        ));
+        return $this->refs;
     }
 
     /**
-     * @param list<SheetReference> $refs
-     **/
+     * @param string[] $refs
+     */
     public function setRefs(array $refs): static
     {
-        $this->refs = array_map(
-            fn(SheetReference $ref): array => $ref->toArray(),
-            $refs
-        );
+        $this->refs = $refs;
 
         return $this;
     }
 
-    public function getFile(): ?string
+    /**
+     * @return string[]
+     */
+    public function getFiles(): array
     {
-        return $this->file;
+        return $this->files;
     }
 
-    public function setFile(?string $file): static
+    /**
+     * @param string[]|null $files
+     * @return $this
+     */
+    public function setFiles(?array $files): static
     {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
+        $this->files = $files ?? [];
 
         return $this;
     }
@@ -269,6 +219,28 @@ class Sheet
 
     public function __toString(): string
     {
-        return $this->title ?? '';
+        if (!$this->title) {
+            return '';
+        }
+
+        return $this->title . (count($this->refs) > 0 ? " (" . implode(', ', $this->refs) . ")" : "");
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getUploadedFiles(): array
+    {
+        return $this->files;
+    }
+
+    public function getFullPath(): ?string
+    {
+        return $this->fullPath;
+    }
+
+    public function setFullPath(?string $fullPath): void
+    {
+        $this->fullPath = $fullPath;
     }
 }

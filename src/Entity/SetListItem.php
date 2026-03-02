@@ -7,10 +7,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
-use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: SetListItemRepository::class)]
-#[ORM\UniqueConstraint(name: 'unique_position_per_setlist', columns: ['setlist_id', 'position'])]
 class SetListItem
 {
     use TimestampableEntity;
@@ -30,7 +28,6 @@ class SetListItem
     private ?Sheet $sheet = null;
 
     #[ORM\Column(type: Types::INTEGER)]
-    #[NotNull]
     private ?int $position = null;
 
     #[ORM\Column(length: 100)]
@@ -38,10 +35,6 @@ class SetListItem
 
     #[ORM\Column(type: Types::TEXT)]
     private string $notes = "";
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
 
     public function getId(): ?int
     {
@@ -104,18 +97,6 @@ class SetListItem
     public function setNotes(string $notes): static
     {
         $this->notes = $notes;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
 
         return $this;
     }

@@ -1,0 +1,9 @@
+{% set multiple = field.customOptions.get('multiple') %}
+
+{% if multiple %}
+    <div>
+        {{ field.value | join(' / ') }}
+    </div>
+{% else %}
+    <div>{{ field.value }}</div>
+{% endif %}

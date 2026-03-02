@@ -37,14 +37,10 @@ class Setlist
     #[NotNull]
     private string $notes = "";
 
-    #[ORM\ManyToOne(inversedBy: 'setlists')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Organization $organization = null;
-
     /**
      * @var Collection<int, SetListItem>
      */
-    #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'setlist', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'setlist', cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $item;
 
@@ -90,18 +86,6 @@ class Setlist
     public function setNotes(string $notes): static
     {
         $this->notes = $notes;
-
-        return $this;
-    }
-
-    public function getOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(?Organization $organization): static
-    {
-        $this->organization = $organization;
 
         return $this;
     }
