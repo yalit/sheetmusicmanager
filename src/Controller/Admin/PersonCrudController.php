@@ -3,8 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Person;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -26,6 +28,17 @@ class PersonCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Person')
             ->setEntityLabelInPlural('Persons')
             ->setSearchFields(['name'])
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::INDEX,  'ROLE_MEMBER')
+            ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
+            ->setPermission(Action::NEW,    'ROLE_LIBRARIAN')
+            ->setPermission(Action::EDIT,   'ROLE_LIBRARIAN')
+            ->setPermission(Action::DELETE, 'ROLE_LIBRARIAN')
         ;
     }
 
