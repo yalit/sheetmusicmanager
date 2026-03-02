@@ -9,7 +9,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route('/admin/login', name: 'admin_login')]
+    #[Route('/login', name: 'admin_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
@@ -34,7 +34,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/logout', name: 'admin_logout')]
+    #[Route('/logout', name: 'admin_logout')]
     public function logout(): void
     {
         throw new \LogicException('Intercepted by the firewall logout listener.');

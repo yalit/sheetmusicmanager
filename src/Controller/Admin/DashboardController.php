@@ -16,7 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 
 /** @package App\Controller\Admin */
-#[AdminDashboard(routePath: '/admin', routeName: 'admin')]
+#[AdminDashboard(routePath: '/', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
     public function index(): Response
