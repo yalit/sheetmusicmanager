@@ -21,7 +21,11 @@ class MemberCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setSearchFields(['name', 'email']);
+        return $crud
+            ->setEntityLabelInSingular('Member')
+            ->setEntityLabelInPlural('Members')
+            ->setSearchFields(['name', 'email'])
+        ;
     }
 
     public function configureFilters(Filters $filters): Filters

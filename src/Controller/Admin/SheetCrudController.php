@@ -42,7 +42,11 @@ class SheetCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setSearchFields(['title', 'tags']);
+        return $crud
+            ->setEntityLabelInSingular('Sheet')
+            ->setEntityLabelInPlural('Sheets')
+            ->setSearchFields(['title', 'tags'])
+        ;
     }
 
     public function configureFilters(Filters $filters): Filters

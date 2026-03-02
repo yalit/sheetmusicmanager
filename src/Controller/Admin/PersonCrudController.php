@@ -22,7 +22,11 @@ class PersonCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setSearchFields(['name']);
+        return $crud
+            ->setEntityLabelInSingular('Person')
+            ->setEntityLabelInPlural('Persons')
+            ->setSearchFields(['name'])
+        ;
     }
 
     public function configureFilters(Filters $filters): Filters
