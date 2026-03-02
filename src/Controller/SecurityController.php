@@ -17,8 +17,20 @@ class SecurityController extends AbstractController
         }
 
         return $this->render('security/login.html.twig', [
-            'error'         => $authenticationUtils->getLastAuthenticationError(),
-            'last_username' => $authenticationUtils->getLastUsername(),
+            'error'                  => $authenticationUtils->getLastAuthenticationError(),
+            'last_username'          => $authenticationUtils->getLastUsername(),
+            'page_title'             => 'Sheet Music Manager',
+            'csrf_token_intention'   => 'authenticate',
+            'username_label'         => 'Email',
+            'password_label'         => 'Password',
+            'sign_in_label'          => 'Sign in',
+            'username_parameter'     => '_username',
+            'password_parameter'     => '_password',
+            'remember_me_enabled'    => true,
+            'remember_me_parameter'  => '_remember_me',
+            'remember_me_checked'    => false,
+            'remember_me_label'      => 'Remember me',
+            'forgot_password_enabled' => false,
         ]);
     }
 
