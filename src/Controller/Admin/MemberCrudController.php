@@ -3,8 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Member;
+use App\Enum\MemberRole;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class MemberCrudController extends AbstractCrudController
@@ -22,6 +23,11 @@ class MemberCrudController extends AbstractCrudController
             ->onlyOnForms()
             ->setRequired($pageName === "new")
             ->setHelp($pageName === "edit" ? "Remplir en cas de changement..." : "")
+        ;
+        yield ChoiceField::new('role', 'Role')
+            ->setChoices(MemberRole::choices())
+            ->setFormTypeOptions(['choice_value' => fn(?MemberRole $r) => $r?->value])
+            ->setRequired(false)
         ;
     }
 }

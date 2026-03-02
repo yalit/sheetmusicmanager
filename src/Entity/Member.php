@@ -3,9 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\MemberRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
+use App\Enum\MemberRole;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Exception;
@@ -22,8 +20,6 @@ use Symfony\Component\Validator\Constraints\NotNull;
 class Member implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableEntity;
-
-    public const DEFAULT_ROLE = "ROLE_MEMBER";
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -47,11 +43,8 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    /**
-     * @var list<string>
-     */
-    #[ORM\Column(type: Types::JSON)]
-    private array $roles = [];
+    #[ORM\Column(length: 50, enumType: MemberRole::class)]
+    private MemberRole $role = MemberRole::Member;
 
     public function eraseCredentials(): void {
         $this->plainPassword = null;
@@ -120,26 +113,21 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getRoles(): array
+    public function getRole(): MemberRole
     {
-        $roles = $this->roles;
-        if (!in_array(static::DEFAULT_ROLE, $roles, true)) {
-            $roles[] = static::DEFAULT_ROLE;
-        }
-        return $roles;
+        return $this->role;
     }
 
-    /**
-     * @param list<string> $roles
-     */
-    public function setRoles(array $roles): static
+    public function setRole(?MemberRole $role): static
     {
-        $this->roles = $roles;
+        $this->role = $role ?? MemberRole::Member;
 
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        return [$this->role->value];
     }
 
     public function __toString(): string
