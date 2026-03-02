@@ -7,7 +7,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
-use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: SetListItemRepository::class)]
 #[ORM\UniqueConstraint(name: 'unique_position_per_setlist', columns: ['setlist_id', 'position'])]
@@ -30,7 +29,6 @@ class SetListItem
     private ?Sheet $sheet = null;
 
     #[ORM\Column(type: Types::INTEGER)]
-    #[NotNull]
     private ?int $position = null;
 
     #[ORM\Column(length: 100)]

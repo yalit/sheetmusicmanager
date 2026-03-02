@@ -36,8 +36,6 @@
 {% endblock %}
 
 
-
-
 {% block app_autocomplete_widget %}
     {{ form_widget(form, {'attr': {
         'autocomplete': true,
@@ -46,4 +44,93 @@
         'data-create': form.vars.create ?? '',
         'data-multiple': form.vars.multiple ?? ''
     }}) }}
+{% endblock %}
+
+
+{# ─── Table collection ──────────────────────────────────────────────────────
+   table_collection_row    : sets data-* attrs on the row container; calls
+                             block('form_row') for the outer structure.
+   table_collection_widget : renders existing entries as <tr> rows, plus a
+                             <template data-table-prototype> holding the
+                             prototype row (avoids HTML-attribute escaping).
+   ─────────────────────────────────────────────────────────────────────────── #}
+
+{% block table_collection_row %}
+    {# Compute num-items #}
+    {% set maxKey = 0 %}
+    {% for key in form.children|keys %}
+        {% if key matches '/^\\d+$/' %}
+            {% set intKey = key|number_format(0, '', '', '') %}
+            {% if intKey > maxKey %}{% set maxKey = intKey %}{% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% set row_attr = row_attr|merge({
+        'data-table-collection-field': 'true',
+        'data-allow-add': allow_add|default(false) ? 'true' : 'false',
+        'data-allow-delete': allow_delete|default(false) ? 'true' : 'false',
+        'data-num-items': form.children is empty ? 0 : maxKey + 1,
+        'data-form-type-name-placeholder': form.vars.prototype is defined ? form.vars.prototype.vars.name : '',
+    }) %}
+
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block table_collection_widget %}
+    <table class="table table-sm table-collection">
+        <thead>
+            <tr>
+                {% if allow_delete|default(false) %}<th class="table-collection-col-delete"></th>{% endif %}
+                {% for child in form.vars.prototype %}
+                    {% if child.vars.block_prefixes|filter(p => p starts with 'ea_form_')|length == 0 %}
+                        <th>{{ child.vars.label ?? child.vars.name|humanize }}</th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody data-table-collection-body>
+            {% for entry in form %}
+                <tr>
+                    {% if allow_delete|default(false) %}
+                        <td class="table-collection-col-delete">
+                            <button type="button" class="btn btn-sm btn-outline-danger table-collection-delete" title="Remove">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    {% endif %}
+                    {% for child in entry %}
+                        {% if child.vars.block_prefixes|filter(p => p starts with 'ea_form_')|length == 0 %}
+                            <td>{{ form_widget(child) }}{{ form_errors(child) }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    <td style="display:none">{{ form_rest(entry) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if form.vars.prototype is defined %}
+        {% set proto = form.vars.prototype %}
+        <template data-table-prototype>
+            <tr>
+                {% if allow_delete|default(false) %}
+                    <td class="table-collection-col-delete">
+                        <button type="button" class="btn btn-sm btn-outline-danger table-collection-delete" title="Remove">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                {% endif %}
+                {% for child in proto %}
+                    {% if child.vars.block_prefixes|filter(p => p starts with 'ea_form_')|length == 0 %}
+                        <td>{{ form_widget(child) }}</td>
+                    {% endif %}
+                {% endfor %}
+                <td style="display:none">{{ form_rest(proto) }}</td>
+            </tr>
+        </template>
+    {% endif %}
+    {% if allow_add|default(false) %}
+        <button type="button" class="btn btn-sm btn-outline-secondary table-collection-add mt-2">
+            <i class="fa fa-plus"></i> Add item
+        </button>
+    {% endif %}
 {% endblock %}

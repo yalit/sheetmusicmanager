@@ -40,7 +40,7 @@ class Setlist
     /**
      * @var Collection<int, SetListItem>
      */
-    #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'setlist', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'setlist', cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $item;
 

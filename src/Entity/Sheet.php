@@ -219,7 +219,11 @@ class Sheet
 
     public function __toString(): string
     {
-        return $this->title ?? '';
+        if (!$this->title) {
+            return '';
+        }
+
+        return $this->title . (count($this->refs) > 0 ? " (" . implode(', ', $this->refs) . ")" : "");
     }
 
     /**

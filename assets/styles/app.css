@@ -1,55 +1,37 @@
-/* Setlist items collection — table layout */
-[data-setlist-collection] {
-    .ea-form-collection-items .accordion {
-        border: none;
-        background: none;
-    }
+/* Generic table collection */
+.table-collection {
+    width: 100%;
 
-    .setlist-header-row,
-    .setlist-item-row {
-        display: grid;
-        grid-template-columns: 90px 1fr 180px 1fr 44px;
-        gap: 8px;
-        align-items: center;
-        padding: 4px 6px;
-    }
-
-    .setlist-header-row {
+    th {
         font-weight: 600;
-        color: #6c757d;
         font-size: 0.8em;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        border-bottom: 2px solid #dee2e6;
-        padding-bottom: 8px;
+        color: #6c757d;
+        white-space: nowrap;
     }
 
-    .setlist-item-row {
-        border-bottom: 1px solid #f0f0f0;
+    .table-collection-col-delete {
+        width: 44px;
     }
 
-    .setlist-item-row:last-child {
-        border-bottom: none;
+    td {
+        vertical-align: middle;
     }
 
-    .setlist-item-row:hover {
-        background-color: #f8f9fa;
-    }
-
-    .setlist-item-cell label {
+    td label {
         display: none;
     }
 
-    .setlist-item-cell .form-control,
-    .setlist-item-cell .form-select {
+    td .form-control,
+    td .form-select {
         padding: 2px 6px;
         font-size: 0.9em;
     }
+}
 
-    .field-collection-item {
-        border: none !important;
-        padding: 0 !important;
-    }
+.table-collection {
+    width: 100%;
 }
 
 #app_pdf_field {
