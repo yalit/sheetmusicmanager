@@ -4,7 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Admin\Fields\CollectionTableField;
 use App\Entity\Setlist;
+use App\Security\Voter\SetlistVoter;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -31,6 +34,17 @@ class SetlistCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Setlists')
             ->setDefaultSort(['date' => 'DESC'])
             ->setSearchFields(['title'])
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::INDEX,  'ROLE_MEMBER')
+            ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
+            ->setPermission(Action::NEW,    'ROLE_MEMBER')
+            ->setPermission(Action::EDIT,   SetlistVoter::EDIT)
+            ->setPermission(Action::DELETE, SetlistVoter::DELETE)
         ;
     }
 
