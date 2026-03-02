@@ -20,11 +20,12 @@ Implement comprehensive authentication, authorization, and role-based access con
 **Description**: Set up Symfony security configuration with password hashing and user provider.
 
 **Tasks**:
-- [ ] Configure `security.yaml`
-- [ ] Set password hasher to bcrypt/argon2
-- [ ] Configure user provider using Member entity
-- [ ] Configure firewall for /admin routes
-- [ ] Set up access control rules
+- [x] Configure `security.yaml`
+- [x] Set password hasher to `auto` (bcrypt/argon2)
+- [x] Configure user provider using Member entity (property: email)
+- [ ] Configure firewall for /admin routes (form_login, logout, remember_me missing)
+- [ ] Set up access control rules (currently commented out)
+- [ ] Define role hierarchy
 
 **Technical Details**:
 
