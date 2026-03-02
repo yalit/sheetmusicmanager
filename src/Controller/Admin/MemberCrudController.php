@@ -4,6 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\Member;
 use App\Enum\MemberRole;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -25,6 +27,17 @@ class MemberCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Member')
             ->setEntityLabelInPlural('Members')
             ->setSearchFields(['name', 'email'])
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::INDEX,  'ROLE_LIBRARIAN')
+            ->setPermission(Action::DETAIL, 'ROLE_LIBRARIAN')
+            ->setPermission(Action::NEW,    'ROLE_ADMIN')
+            ->setPermission(Action::EDIT,   'ROLE_LIBRARIAN')
+            ->setPermission(Action::DELETE, 'ROLE_ADMIN')
         ;
     }
 
