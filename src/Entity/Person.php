@@ -27,11 +27,11 @@ class Person
      * @var Collection<int, CreditedPerson>
      */
     #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'person', orphanRemoval: true)]
-    private Collection $credit;
+    private Collection $credits;
 
     public function __construct()
     {
-        $this->credit = new ArrayCollection();
+        $this->credits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -54,15 +54,15 @@ class Person
     /**
      * @return Collection<int, CreditedPerson>
      */
-    public function getCredit(): Collection
+    public function getCredits(): Collection
     {
-        return $this->credit;
+        return $this->credits;
     }
 
     public function addCredit(CreditedPerson $credit): static
     {
-        if (!$this->credit->contains($credit)) {
-            $this->credit->add($credit);
+        if (!$this->credits->contains($credit)) {
+            $this->credits->add($credit);
             $credit->setPerson($this);
         }
 
@@ -71,7 +71,7 @@ class Person
 
     public function removeCredit(CreditedPerson $credit): static
     {
-        if ($this->credit->removeElement($credit)) {
+        if ($this->credits->removeElement($credit)) {
             // set the owning side to null (unless already changed)
             if ($credit->getPerson() === $this) {
                 $credit->setPerson(null);

@@ -58,7 +58,7 @@ class Sheet
     /**
      * @var Collection<int, CreditedPerson>
      */
-    #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'sheet', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: CreditedPerson::class, mappedBy: 'sheet', cascade: ['persist'], orphanRemoval: true)]
     private Collection $credit;
 
     /**

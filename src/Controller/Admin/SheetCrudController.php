@@ -3,12 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Admin\Fields\ChoiceAutoCompleteStringField;
+use App\Admin\Fields\CollectionTableField;
 use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
 use App\Repository\SheetRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -26,9 +26,9 @@ class SheetCrudController extends AbstractCrudController
 
     public function __construct(
         private readonly SheetRepository $sheetRepository,
-        private readonly RequestStack $requestStack,
-        private readonly Filesystem   $filesystem,
-        private readonly string       $projectDir,
+        private readonly RequestStack    $requestStack,
+        private readonly Filesystem      $filesystem,
+        private readonly string          $projectDir,
     )
     {
     }
@@ -47,19 +47,20 @@ class SheetCrudController extends AbstractCrudController
 
         yield PDFField::new('files', 'Fichier PDF')
             ->setUploadDir($this->uploadDir)
-            ->setRequired($pageName === Crud::PAGE_NEW)
-            ;
+            ->setRequired($pageName === Crud::PAGE_NEW);
 
         yield FormField::addColumn(4);
         yield FormField::addPanel("Details");
         yield ChoiceAutoCompleteStringField::new('refs')
-            ->setChoices([$this->sheetRepository, 'getAllRefs'])
-        ;
+            ->setChoices([$this->sheetRepository, 'getAllRefs']);
         yield ChoiceAutoCompleteStringField::new('tags')
-            ->setChoices([$this->sheetRepository, 'getAllTags'])
-        ;
+            ->setChoices([$this->sheetRepository, 'getAllTags']);
 
-        yield FormField::addPanel("Details");
+        yield CollectionTableField::new('credit', 'Credits')
+            ->useEntryCrudForm(CreditedPersonCrudController::class)
+            ->allowAdd()
+            ->allowDelete()
+            ->hideOnIndex();
         yield TextareaField::new('notes')
             ->setNumOfRows(5)
             ->hideOnIndex();

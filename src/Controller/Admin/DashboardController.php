@@ -3,8 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Member;
-use App\Entity\Organization;
 use App\Entity\Person;
+use App\Entity\PersonType;
 use App\Entity\Setlist;
 use App\Entity\Sheet;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -50,14 +50,13 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-
         yield MenuItem::section('Administration');
         yield MenuItem::linkToCrud('Members', 'fa fa-users', Member::class);
 
         yield MenuItem::section('Partitions');
-        yield MenuItem::linkToCrud('Sheets', 'fa fa-music', Sheet::class);
+        yield MenuItem::linkToCrud('Person Types', 'fa fa-tags', PersonType::class);
         yield MenuItem::linkToCrud('Persons', 'fa fa-user', Person::class);
+        yield MenuItem::linkToCrud('Sheets', 'fa fa-music', Sheet::class);
 
         yield MenuItem::section('Performances');
         yield MenuItem::linkToCrud('Setlists', 'fa fa-list', Setlist::class);

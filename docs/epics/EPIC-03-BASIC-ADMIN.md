@@ -1,7 +1,7 @@
 # Epic 3: Basic EasyAdmin CRUD
 
 **Branch**: `epic/03-basic-admin`
-**Status**: ⏳ Pending
+**Status**: 🔄 In Progress
 **Estimated Effort**: 2-3 hours
 **Dependencies**: Epic 2 (Entity Layer)
 
@@ -22,11 +22,11 @@ Set up EasyAdmin with basic CRUD controllers for all entities. This creates the 
 **Description**: Generate and configure the main EasyAdmin dashboard.
 
 **Tasks**:
-- [ ] Generate dashboard: `php bin/console make:admin:dashboard`
-- [ ] Configure dashboard title and menu
-- [ ] Set default page
-- [ ] Add menu sections
-- [ ] Configure dashboard layout
+- [x] Generate dashboard: `php bin/console make:admin:dashboard`
+- [x] Configure dashboard title and menu
+- [x] Set default page
+- [x] Add menu sections
+- [x] Configure dashboard layout
 
 **Command**:
 ```bash
@@ -88,90 +88,30 @@ class DashboardController extends AbstractDashboardController
 ```
 
 **Acceptance Criteria**:
-- Dashboard controller created
-- Menu configured with all entities
-- Menu organized into logical sections
-- Dashboard accessible at `/admin`
+- [x] Dashboard controller created
+- [x] Menu configured with all entities (adapted: no Organization entity exists)
+- [x] Menu organized into logical sections
+- [x] Dashboard accessible at `/admin`
 
 **Deliverables**:
-- `src/Controller/Admin/DashboardController.php`
-- `templates/admin/dashboard.html.twig`
+- [x] `src/Controller/Admin/DashboardController.php`
+- [ ] `templates/admin/dashboard.html.twig` ← redirects to Sheet index instead
 
 ---
 
 ### Story 3.2: Create Organization CRUD Controller
 
-**Description**: Generate CRUD controller for Organization entity.
-
-**Tasks**:
-- [ ] Generate CRUD: `php bin/console make:admin:crud`
-- [ ] Configure fields for list view
-- [ ] Configure fields for form view
-- [ ] Configure fields for detail view
-- [ ] Add search fields
-
-**Command**:
-```bash
-php bin/console make:admin:crud
-# Choose: Organization
-# Generate in: src/Controller/Admin
-```
-
-**Configuration** (`src/Controller/Admin/OrganizationCrudController.php`):
-```php
-<?php
-
-namespace App\Controller\Admin;
-
-use App\Entity\Organization;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-
-class OrganizationCrudController extends AbstractCrudController
-{
-    public static function getEntityFqcn(): string
-    {
-        return Organization::class;
-    }
-
-    public function configureCrud(Crud $crud): Crud
-    {
-        return $crud
-            ->setEntityLabelInSingular('Organization')
-            ->setEntityLabelInPlural('Organizations')
-            ->setSearchFields(['name', 'type'])
-            ->setDefaultSort(['name' => 'ASC']);
-    }
-
-    public function configureFields(string $pageName): iterable
-    {
-        yield IdField::new('id')->onlyOnIndex();
-        yield TextField::new('name');
-        yield TextField::new('type');
-        yield ImageField::new('logo')
-            ->setBasePath('uploads/logos')
-            ->setUploadDir('public/uploads/logos')
-            ->setUploadedFileNamePattern('[randomhash].[extension]')
-            ->hideOnIndex();
-        yield DateTimeField::new('createdAt')->hideOnForm();
-        yield DateTimeField::new('updatedAt')->hideOnForm();
-    }
-}
-```
+> ⚠️ **N/A** — `Organization` entity was not created in the entity layer (Epic 2 deviated from plan). Skip until entity exists.
 
 **Acceptance Criteria**:
-- CRUD controller created
-- All fields configured
-- Search enabled on name and type
-- Logo upload configured
-- Timestamps displayed in list view
+- [ ] CRUD controller created
+- [ ] All fields configured
+- [ ] Search enabled on name and type
+- [ ] Logo upload configured
+- [ ] Timestamps displayed in list view
 
 **Deliverables**:
-- `src/Controller/Admin/OrganizationCrudController.php`
+- [ ] `src/Controller/Admin/OrganizationCrudController.php`
 
 ---
 
@@ -179,47 +119,24 @@ class OrganizationCrudController extends AbstractCrudController
 
 **Description**: Generate CRUD controller for Person entity (composers/arrangers).
 
+> ℹ️ `type` is not a property of Person — a person's role depends on context (sheet credit). Handled via `PersonType` entity on `CreditedPerson` instead. `Organization` entity was dropped.
+
 **Tasks**:
-- [ ] Generate CRUD controller
-- [ ] Configure fields
-- [ ] Add association field for Organization
-- [ ] Add filter by type
+- [x] Generate CRUD controller
+- [x] Configure fields (name)
+- [x] Person type handled via PersonType entity on CreditedPerson (see Story 3.4)
+- [ ] Configure filters
 - [ ] Configure search
 
-**Key Configuration**:
-```php
-public function configureFields(string $pageName): iterable
-{
-    yield IdField::new('id')->onlyOnIndex();
-    yield TextField::new('name');
-    yield ChoiceField::new('type')
-        ->setChoices([
-            'Composer' => 'composer',
-            'Arranger' => 'arranger',
-            'Both' => 'both',
-        ]);
-    yield AssociationField::new('organization');
-    yield DateTimeField::new('createdAt')->hideOnForm();
-    yield DateTimeField::new('updatedAt')->hideOnForm();
-}
-
-public function configureFilters(Filters $filters): Filters
-{
-    return $filters
-        ->add('type')
-        ->add('organization');
-}
-```
-
 **Acceptance Criteria**:
-- CRUD controller created
-- Type field as choice dropdown
-- Organization association field
-- Filters configured
-- Search enabled
+- [x] CRUD controller created
+- [x] Person type as configurable entity (`PersonTypeCrudController` added to menu)
+- [ ] Filters configured
+- [ ] Search enabled
 
 **Deliverables**:
-- `src/Controller/Admin/PersonCrudController.php`
+- [x] `src/Controller/Admin/PersonCrudController.php`
+- [x] `src/Controller/Admin/PersonTypeCrudController.php`
 
 ---
 
@@ -227,69 +144,27 @@ public function configureFilters(Filters $filters): Filters
 
 **Description**: Generate CRUD controller for Sheet entity.
 
+> ℹ️ Entity deviated from plan: no `genre`, `difficulty`, `status`, `composer`, `arranger` fields. Has `tags`, `refs`, `files` (multi-PDF) instead. Controller adapted accordingly.
+
 **Tasks**:
-- [ ] Generate CRUD controller
-- [ ] Configure all text fields
-- [ ] Configure choice fields (difficulty, status)
-- [ ] Configure association fields (composer, arranger, organization)
-- [ ] Configure file uploads (PDF, cover image)
-- [ ] Configure JSON field (references) - basic display
+- [x] Generate CRUD controller
+- [x] Configure all text fields
+- [ ] Configure choice fields (difficulty, status) ← not on entity
+- [x] Configure credits (Person + PersonType) as inline table collection
+- [x] Configure file uploads (PDF via custom PDFField)
+- [x] Configure refs as custom ChoiceAutoCompleteStringField
 - [ ] Add filters and search
 
-**Key Configuration**:
-```php
-public function configureFields(string $pageName): iterable
-{
-    yield IdField::new('id')->onlyOnIndex();
-    yield TextField::new('title');
-    yield TextField::new('genre')->hideOnIndex();
-    yield ChoiceField::new('difficulty')
-        ->setChoices([
-            'Beginner' => 'beginner',
-            'Intermediate' => 'intermediate',
-            'Advanced' => 'advanced',
-        ]);
-    yield TextField::new('duration')->hideOnIndex();
-    yield TextField::new('keySignature')->hideOnIndex();
-    yield ChoiceField::new('status')
-        ->setChoices([
-            'Active' => 'active',
-            'Archived' => 'archived',
-        ]);
-    yield TextareaField::new('notes')->hideOnIndex();
-
-    // Associations
-    yield AssociationField::new('composer');
-    yield AssociationField::new('arranger');
-    yield AssociationField::new('organization')->hideOnForm();
-
-    // Files
-    yield ImageField::new('coverImage')
-        ->setBasePath('uploads/covers')
-        ->setUploadDir('public/uploads/covers')
-        ->hideOnIndex();
-    yield Field::new('pdfFile')
-        ->setFormType(FileType::class)
-        ->hideOnIndex();
-
-    // JSON field - basic display for now
-    yield ArrayField::new('references')->hideOnIndex();
-
-    // Timestamps
-    yield DateTimeField::new('createdAt')->hideOnForm();
-    yield DateTimeField::new('updatedAt')->hideOnForm();
-}
-```
-
 **Acceptance Criteria**:
-- CRUD controller created
-- All fields configured
-- File uploads working
-- Associations working
-- Filters and search configured
+- [x] CRUD controller created
+- [x] Fields configured (adapted to actual entity)
+- [x] File uploads working (custom multi-PDF field)
+- [x] Credits (Person + PersonType) as inline table via CollectionTableField
+- [ ] Filters and search configured
 
 **Deliverables**:
-- `src/Controller/Admin/SheetCrudController.php`
+- [x] `src/Controller/Admin/SheetCrudController.php`
+- [x] `src/Controller/Admin/CreditedPersonCrudController.php`
 
 ---
 
@@ -298,88 +173,35 @@ public function configureFields(string $pageName): iterable
 **Description**: Generate CRUD controller for Setlist entity.
 
 **Tasks**:
-- [ ] Generate CRUD controller
-- [ ] Configure fields
-- [ ] Configure date field for event_date
-- [ ] Configure status choice field
-- [ ] Add association to organization
+- [x] Generate CRUD controller
+- [x] Configure fields
+- [x] Configure date field
+- [ ] Configure status choice field ← no `status` field on entity
+- [ ] Add association to organization ← no Organization entity
 - [ ] Configure filters and search
 
-**Key Configuration**:
-```php
-public function configureFields(string $pageName): iterable
-{
-    yield IdField::new('id')->onlyOnIndex();
-    yield TextField::new('name');
-    yield DateField::new('eventDate');
-    yield TextField::new('occasion')->hideOnIndex();
-    yield ChoiceField::new('status')
-        ->setChoices([
-            'Draft' => 'draft',
-            'Finalized' => 'finalized',
-            'Performed' => 'performed',
-        ]);
-    yield TextareaField::new('notes')->hideOnIndex();
-    yield AssociationField::new('organization')->hideOnForm();
-    yield DateTimeField::new('createdAt')->hideOnForm();
-    yield DateTimeField::new('updatedAt')->hideOnForm();
-}
-```
-
 **Acceptance Criteria**:
-- CRUD controller created
-- All fields configured
-- Status choice field working
-- Date field configured
+- [x] CRUD controller created
+- [x] Fields configured (title, date)
+- [x] Inline SetlistItem collection as table (enhancement over plan)
+- [ ] Status choice field ← not on entity
 
 **Deliverables**:
-- `src/Controller/Admin/SetlistCrudController.php`
+- [x] `src/Controller/Admin/SetlistCrudController.php`
 
 ---
 
 ### Story 3.6: Create SetlistItem CRUD Controller
 
-**Description**: Generate CRUD controller for SetlistItem entity.
-
-**Tasks**:
-- [ ] Generate CRUD controller
-- [ ] Configure fields
-- [ ] Configure associations to Setlist and Sheet
-- [ ] Configure position field
-- [ ] Set default sort by position
-- [ ] Configure search
-
-**Key Configuration**:
-```php
-public function configureCrud(Crud $crud): Crud
-{
-    return $crud
-        ->setEntityLabelInSingular('Setlist Item')
-        ->setEntityLabelInPlural('Setlist Items')
-        ->setDefaultSort(['position' => 'ASC']);
-}
-
-public function configureFields(string $pageName): iterable
-{
-    yield IdField::new('id')->onlyOnIndex();
-    yield AssociationField::new('setlist');
-    yield AssociationField::new('sheet');
-    yield IntegerField::new('position');
-    yield TextField::new('name');
-    yield TextareaField::new('notes')->hideOnIndex();
-    yield DateTimeField::new('createdAt')->hideOnForm();
-    yield DateTimeField::new('updatedAt')->hideOnForm();
-}
-```
+> ℹ️ **Implemented differently**: not exposed as a standalone menu entry. Used exclusively as the entry form config for the inline table collection in SetlistCrudController via `useEntryCrudForm()`.
 
 **Acceptance Criteria**:
-- CRUD controller created
-- Associations configured
-- Sorted by position by default
-- All fields working
+- [x] Controller created (technical, not in menu)
+- [x] Associations configured (sheet)
+- [x] Position auto-assigned server-side from row order
 
 **Deliverables**:
-- `src/Controller/Admin/SetlistItemCrudController.php`
+- [x] `src/Controller/Admin/SetlistItemCrudController.php`
 
 ---
 
@@ -388,180 +210,75 @@ public function configureFields(string $pageName): iterable
 **Description**: Generate CRUD controller for Member entity (User).
 
 **Tasks**:
-- [ ] Generate CRUD controller
-- [ ] Configure fields
-- [ ] Configure password hashing
-- [ ] Configure roles as array choice field
-- [ ] Add association to organization
-- [ ] Hide password on list/detail views
-
-**Key Configuration**:
-```php
-public function configureFields(string $pageName): iterable
-{
-    yield IdField::new('id')->onlyOnIndex();
-    yield TextField::new('name');
-    yield EmailField::new('email');
-    yield TextField::new('password')
-        ->setFormType(PasswordType::class)
-        ->onlyOnForms();
-    yield ChoiceField::new('roles')
-        ->setChoices([
-            'Member' => 'ROLE_MEMBER',
-            'Librarian' => 'ROLE_LIBRARIAN',
-            'Conductor' => 'ROLE_CONDUCTOR',
-            'Admin' => 'ROLE_ADMIN',
-        ])
-        ->allowMultipleChoices()
-        ->renderExpanded();
-    yield AssociationField::new('organization');
-    yield DateTimeField::new('createdAt')->hideOnForm();
-    yield DateTimeField::new('updatedAt')->hideOnForm();
-}
-```
-
-**Password Hashing** (add to controller):
-```php
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
-public function __construct(
-    private UserPasswordHasherInterface $passwordHasher
-) {}
-
-public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
-{
-    if ($entityInstance instanceof Member && $entityInstance->getPassword()) {
-        $entityInstance->setPassword(
-            $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword())
-        );
-    }
-    parent::persistEntity($entityManager, $entityInstance);
-}
-
-public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
-{
-    if ($entityInstance instanceof Member && $entityInstance->getPassword()) {
-        $entityInstance->setPassword(
-            $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword())
-        );
-    }
-    parent::updateEntity($entityManager, $entityInstance);
-}
-```
+- [x] Generate CRUD controller
+- [x] Configure fields
+- [x] Configure password field (plainPassword, handled by entity)
+- [ ] Configure roles as array choice field ← not implemented
+- [ ] Add association to organization ← no Organization entity
+- [x] Hide password on list/detail views
 
 **Acceptance Criteria**:
-- CRUD controller created
-- Password hashed on save
-- Roles configured as multi-choice
-- Email field configured
+- [x] CRUD controller created
+- [ ] Password hashed on save ← uses plainPassword on entity (verify hashing is wired)
+- [ ] Roles configured as multi-choice ← not implemented
+- [x] Email field configured
 
 **Deliverables**:
-- `src/Controller/Admin/MemberCrudController.php`
+- [x] `src/Controller/Admin/MemberCrudController.php`
 
 ---
 
 ### Story 3.8: Configure Menu & Navigation
 
-**Description**: Enhance menu organization and add icons.
-
 **Tasks**:
-- [ ] Organize menu into logical sections
-- [ ] Add Font Awesome icons to menu items
+- [x] Organize menu into logical sections
+- [x] Add Font Awesome icons to menu items
 - [ ] Set menu badges (optional - counts)
 - [ ] Configure menu item visibility based on user roles (for later)
 
-**Enhanced Menu** (already in Story 3.1, ensure it's polished):
-```php
-public function configureMenuItems(): iterable
-{
-    yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-
-    yield MenuItem::section('Music Library');
-    yield MenuItem::linkToCrud('Sheets', 'fa fa-music', Sheet::class);
-    yield MenuItem::linkToCrud('Composers & Arrangers', 'fa fa-user-tie', Person::class);
-
-    yield MenuItem::section('Performances');
-    yield MenuItem::linkToCrud('Setlists', 'fa fa-list', Setlist::class);
-    yield MenuItem::linkToCrud('Setlist Items', 'fa fa-bars', SetlistItem::class);
-
-    yield MenuItem::section('Administration');
-    yield MenuItem::linkToCrud('Organizations', 'fa fa-building', Organization::class);
-    yield MenuItem::linkToCrud('Members', 'fa fa-users', Member::class);
-}
-```
-
 **Acceptance Criteria**:
-- Menu organized into sections
-- Icons added to all menu items
-- Menu items navigate correctly
+- [x] Menu organized into sections (Administration, Partitions, Performances)
+- [x] Icons added to all menu items
+- [x] Menu items navigate correctly
 
 **Deliverables**:
-- Enhanced DashboardController
+- [x] Enhanced DashboardController
 
 ---
 
 ### Story 3.9: Basic Styling & UX Polish
 
-**Description**: Configure EasyAdmin theme and polish user experience.
-
 **Tasks**:
 - [ ] Set page titles
 - [ ] Configure breadcrumbs
-- [ ] Set entity labels (singular/plural)
+- [x] Set entity labels (singular/plural) ← done on Setlist only
 - [ ] Configure default page sizes
 - [ ] Test all CRUD operations
 
-**Global Configuration** (in DashboardController):
-```php
-public function configureDashboard(): Dashboard
-{
-    return Dashboard::new()
-        ->setTitle('Sheet Music Manager')
-        ->setFaviconPath('favicon.ico')
-        ->renderContentMaximized()
-        ->generateRelativeUrls();
-}
-```
-
-**Per-Entity Configuration** (in each CRUD controller):
-```php
-public function configureCrud(Crud $crud): Crud
-{
-    return $crud
-        ->setEntityLabelInSingular('Sheet')
-        ->setEntityLabelInPlural('Sheets')
-        ->setPageTitle('index', 'Sheet Music Library')
-        ->setPageTitle('new', 'Add New Sheet')
-        ->setPageTitle('edit', 'Edit %entity_label_singular%')
-        ->setPageTitle('detail', '%entity_label_singular% Details')
-        ->setPaginatorPageSize(30);
-}
-```
-
 **Acceptance Criteria**:
-- Page titles configured
-- Entity labels set
-- Default pagination configured
-- User experience is smooth
+- [ ] Page titles configured
+- [x] `renderContentMaximized()` enabled globally
+- [x] Form themes configured
+- [ ] Default pagination configured
 
 **Deliverables**:
-- Polished CRUD controllers
-- Enhanced dashboard
+- [ ] Polished CRUD controllers
+- [ ] Enhanced dashboard
 
 ---
 
 ## Epic Acceptance Criteria
 
-- [ ] Dashboard controller created and configured
-- [ ] All 7 CRUD controllers created
-- [ ] Menu organized with icons
-- [ ] All entities can be created, read, updated, deleted
-- [ ] File uploads working (basic)
-- [ ] Associations working in forms (dropdowns)
-- [ ] Search and filters working
-- [ ] Passwords hashed for members
-- [ ] Clean, professional UI
-- [ ] No console errors
+- [x] Dashboard controller created and configured
+- [x] All relevant CRUD controllers created (Organization N/A — entity dropped)
+- [x] Menu organized with icons
+- [x] All entities can be created, read, updated, deleted (Organization N/A)
+- [x] File uploads working (PDF)
+- [x] Credits (Person + PersonType) working as inline table on Sheet
+- [ ] Search and filters working ← not configured
+- [ ] Passwords hashed for members ← verify
+- [x] Clean, professional UI
+- [ ] No console errors ← untested
 - [ ] Ready for demo/talk
 
 ---
@@ -576,7 +293,7 @@ symfony server:start
 
 # Visit /admin
 # Test each CRUD:
-- [ ] Create Organization
+- [ ] Create Organization  ← N/A (no entity)
 - [ ] Create Person (composer)
 - [ ] Create Person (arranger)
 - [ ] Create Member (test user)
@@ -599,15 +316,17 @@ symfony server:start
 
 ## Deliverables
 
-- [ ] `src/Controller/Admin/DashboardController.php`
-- [ ] `src/Controller/Admin/OrganizationCrudController.php`
-- [ ] `src/Controller/Admin/PersonCrudController.php`
-- [ ] `src/Controller/Admin/SheetCrudController.php`
-- [ ] `src/Controller/Admin/SetlistCrudController.php`
-- [ ] `src/Controller/Admin/SetlistItemCrudController.php`
-- [ ] `src/Controller/Admin/MemberCrudController.php`
+- [x] `src/Controller/Admin/DashboardController.php`
+- [ ] `src/Controller/Admin/OrganizationCrudController.php` ← N/A (no entity)
+- [x] `src/Controller/Admin/PersonCrudController.php`
+- [x] `src/Controller/Admin/PersonTypeCrudController.php`
+- [x] `src/Controller/Admin/SheetCrudController.php`
+- [x] `src/Controller/Admin/CreditedPersonCrudController.php`
+- [x] `src/Controller/Admin/SetlistCrudController.php`
+- [x] `src/Controller/Admin/SetlistItemCrudController.php`
+- [x] `src/Controller/Admin/MemberCrudController.php`
 - [ ] `templates/admin/dashboard.html.twig`
-- [ ] Working CRUD operations for all entities
+- [ ] Working CRUD operations for all entities ← partially tested
 - [ ] `public/uploads/` directories created
 
 ---
