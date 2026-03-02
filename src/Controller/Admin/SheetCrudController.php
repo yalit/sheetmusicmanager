@@ -8,6 +8,8 @@ use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
 use App\Repository\SheetRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -46,6 +48,17 @@ class SheetCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Sheet')
             ->setEntityLabelInPlural('Sheets')
             ->setSearchFields(['title', 'tags'])
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::INDEX,  'ROLE_MEMBER')
+            ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
+            ->setPermission(Action::NEW,    'ROLE_LIBRARIAN')
+            ->setPermission(Action::EDIT,   'ROLE_CONTRIBUTOR')
+            ->setPermission(Action::DELETE, 'ROLE_LIBRARIAN')
         ;
     }
 
