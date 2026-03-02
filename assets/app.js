@@ -2,6 +2,7 @@ import { registerReactControllerComponents } from '@symfony/ux-react';
 import './stimulus_bootstrap.js';
 import './admin/pdf_field_input.js'
 import './admin/autocomplete_field_input.js'
+import './admin/setlist_collection.js'
 
 /*
  * Welcome to your app's main JavaScript file!

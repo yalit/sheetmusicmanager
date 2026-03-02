@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Member;
 use App\Entity\Organization;
 use App\Entity\Person;
+use App\Entity\Setlist;
 use App\Entity\Sheet;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -57,5 +58,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Partitions');
         yield MenuItem::linkToCrud('Sheets', 'fa fa-music', Sheet::class);
         yield MenuItem::linkToCrud('Persons', 'fa fa-user', Person::class);
+
+        yield MenuItem::section('Performances');
+        yield MenuItem::linkToCrud('Setlists', 'fa fa-list', Setlist::class);
     }
 }
