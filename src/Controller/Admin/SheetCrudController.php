@@ -9,11 +9,13 @@ use App\Entity\Sheet;
 use App\Repository\SheetRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -36,6 +38,16 @@ class SheetCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return Sheet::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud->setSearchFields(['title', 'tags']);
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters->add(TextFilter::new('title'));
     }
 
     public function configureFields(string $pageName): iterable
