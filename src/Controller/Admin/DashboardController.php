@@ -38,6 +38,7 @@ class DashboardController extends AbstractDashboardController
         return $crud
             ->setFormThemes(['admin/form.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
             ->renderContentMaximized()
+            ->setPaginatorPageSize(25)
         ;
     }
 
