@@ -6,10 +6,13 @@ use App\Admin\Fields\CollectionTableField;
 use App\Entity\Setlist;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
 /**
  * @extends AbstractCrudController<Setlist>
@@ -27,6 +30,15 @@ class SetlistCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Setlist')
             ->setEntityLabelInPlural('Setlists')
             ->setDefaultSort(['date' => 'DESC'])
+            ->setSearchFields(['title'])
+        ;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(TextFilter::new('title'))
+            ->add(DateTimeFilter::new('date'))
         ;
     }
 
