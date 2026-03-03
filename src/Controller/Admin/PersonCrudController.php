@@ -3,8 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Person;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use App\Security\Voter\PersonVoter;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -26,6 +29,17 @@ class PersonCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Person')
             ->setEntityLabelInPlural('Persons')
             ->setSearchFields(['name'])
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::INDEX,  PersonVoter::INDEX)
+            ->setPermission(Action::DETAIL, PersonVoter::DETAIL)
+            ->setPermission(Action::NEW,    PersonVoter::NEW)
+            ->setPermission(Action::EDIT,   PersonVoter::EDIT)
+            ->setPermission(Action::DELETE, PersonVoter::DELETE)
         ;
     }
 

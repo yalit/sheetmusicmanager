@@ -3,6 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\PersonType;
+use App\Security\Voter\PersonTypeVoter;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -23,6 +26,17 @@ class PersonTypeCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Person Type')
             ->setEntityLabelInPlural('Person Types')
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::INDEX,  PersonTypeVoter::INDEX)
+            ->setPermission(Action::DETAIL, PersonTypeVoter::DETAIL)
+            ->setPermission(Action::NEW,    PersonTypeVoter::NEW)
+            ->setPermission(Action::EDIT,   PersonTypeVoter::EDIT)
+            ->setPermission(Action::DELETE, PersonTypeVoter::DELETE)
         ;
     }
 

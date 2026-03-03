@@ -41,6 +41,7 @@ tasks:
         cmds:
             - rm -f var/data_test.db
             - "{{.CONSOLE}} d:m:m --env=test --no-interaction"
+            - "{{.CONSOLE}} d:f:l --env=test --no-interaction"
 
     tests:
         desc: Run tests

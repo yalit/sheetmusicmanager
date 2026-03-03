@@ -10,25 +10,34 @@ security:
                 class: App\Entity\Member
                 property: email
 
+    role_hierarchy:
+        ROLE_CONTRIBUTOR: ROLE_MEMBER
+        ROLE_LIBRARIAN: [ROLE_MEMBER, ROLE_CONTRIBUTOR]
+        ROLE_ADMIN: [ROLE_MEMBER, ROLE_CONTRIBUTOR, ROLE_LIBRARIAN]
+
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
         main:
             lazy: true
             provider: app_user_provider
+            form_login:
+                login_path: admin_login
+                check_path: admin_login
+                enable_csrf: true
+                default_target_path: admin
+            logout:
+                path: admin_logout
+                target: admin_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: ROLE_MEMBER }
 
 when@test:
     security:

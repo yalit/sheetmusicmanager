@@ -22,10 +22,8 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    App\Admin\Type\SheetFileType:
-        arguments:
-            $rootDir: '%kernel.project_dir%'
-
     App\Controller\Admin\SheetCrudController:
         arguments:
-            $projectDir: '%kernel.project_dir%'
+            $projectDir: '%kernel.project_dir%/%env(ROOT_DIR_FOR_FILE_UPLOAD)%'
+            $uploadDir: '%env(SHEET_UPLOAD_DIR)%'
+
