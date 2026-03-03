@@ -6,6 +6,7 @@ use App\Admin\Fields\ChoiceAutoCompleteStringField;
 use App\Admin\Fields\CollectionTableField;
 use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
+use App\Filter\TagFilter;
 use App\Repository\SheetRepository;
 use App\Security\Voter\SheetVoter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use App\Filter\HasPdfFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -64,7 +66,15 @@ class SheetCrudController extends AbstractCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters->add(TextFilter::new('title'));
+        $getTagChoices = function () {
+            $tags = $this->sheetRepository->getAllTags();
+            usort($tags, fn($a, $b) => strcmp($a, $b));
+            return array_combine($tags, $tags);
+        };
+        return $filters
+            ->add(TextFilter::new('title'))
+            ->add(HasPdfFilter::new('files', 'Has PDF'))
+            ;
     }
 
     public function configureFields(string $pageName): iterable
@@ -78,7 +88,7 @@ class SheetCrudController extends AbstractCrudController
         yield PDFField::new('uploadedFiles', 'Fichier PDF')
             ->onlyOnForms()
             ->setExistingFiles($this->buildExistingFilesData())
-            ->setRequired($pageName === Crud::PAGE_NEW);
+            ->setRequired(false);
 
         yield FormField::addColumn(4);
         yield FormField::addFieldset("Details");

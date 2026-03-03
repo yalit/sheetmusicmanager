@@ -26,7 +26,7 @@ class SheetRepository extends BaseRepository
             ->getQuery()
             ->getResult();
 
-        return array_values(array_unique(array_merge(...array_column($refs, 'refs'))));
+        return array_values(array_filter(array_unique(array_merge(...array_column($refs, 'refs'))), fn(string $s) => $s !== ""));
     }
 
     /**
@@ -40,6 +40,6 @@ class SheetRepository extends BaseRepository
             ->getQuery()
             ->getResult();
 
-        return array_values(array_unique(array_merge(...array_column($tags, 'tags'))));
+        return array_values(array_filter(array_unique(array_merge(...array_column($tags, 'tags'))), fn(string $s) => $s !== ""));
     }
 }
