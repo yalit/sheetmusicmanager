@@ -1,7 +1,7 @@
 # Epic 4: Authentication & Security Layer
 
-**Branch**: `epic/03-easyadmin`
-**Status**: ✅ Implemented
+**Branch**: `epic/04-authentication`
+**Status**: ✅ Complete
 **Estimated Effort**: 3-4 hours
 **Dependencies**: Epic 3 (Basic Admin)
 
@@ -386,13 +386,13 @@ private function voteOnOwned(mixed $subject, TokenInterface $token): bool
 
 **Description**: Add role checks to custom actions and display actions conditionally.
 
-**Status**: ⏳ Pending — no custom actions exist yet. To be revisited when custom actions are introduced in later epics.
+**Status**: 🚫 Dropped — no custom actions are planned for this project. Standard CRUD actions are fully covered by the voter system. If a custom action is ever added, the pattern is documented below.
 
 **Tasks**:
-- [ ] Add permission checks to custom actions
-- [ ] Configure `displayIf` conditions based on voter checks
-- [ ] Test action visibility with different roles
-- [ ] Ensure unauthorized direct access returns 403
+- [~] Add permission checks to custom actions — N/A
+- [~] Configure `displayIf` conditions based on voter checks — N/A
+- [~] Test action visibility with different roles — N/A
+- [~] Ensure unauthorized direct access returns 403 — N/A
 
 ---
 
@@ -442,17 +442,7 @@ private function voteOnOwned(mixed $subject, TokenInterface $token): bool
 - [x] Test fixtures created for all four roles and all entities
 - [x] All roles tested with DataProvider-based integration tests (access + UI action visibility)
 - [x] Unauthorized access returns 403
-- [ ] Custom actions protected (pending Story 4.6)
-
----
-
-## Remaining
-
-### Story 4.6 — Custom action protection
-No custom actions exist yet. Once custom CRUD actions are added in later epics, each one must:
-- Use `->setPermission()` with a voter constant, or `->displayIf()` with a role check
-- Have a corresponding `denyAccessUnlessGranted()` guard in the action method
-- Be covered by a `testXxxDisplayOnIndex` test in the relevant test class
+- [x] Custom actions: N/A — none planned (Story 4.6 dropped)
 
 ---
 
@@ -495,7 +485,6 @@ task tests
 - [x] `src/DataFixtures/SetlistFixtures.php`
 - [x] Updated CRUD controllers with voter-based permission configuration
 - [x] Working authentication and authorization system
-- [ ] Custom action protection (Story 4.6)
 
 ---
 
