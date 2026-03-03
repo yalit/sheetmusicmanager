@@ -4,10 +4,10 @@ namespace App\Enum;
 
 enum MemberRole: string
 {
-    case Member = 'ROLE_MEMBER';
-    case Contributor = 'ROLE_CONTRIBUTOR';
-    case Librarian = 'ROLE_LIBRARIAN';
-    case Admin = 'ROLE_ADMIN';
+    case Member = 'member';
+    case Contributor = 'contributor';
+    case Librarian = 'librarian';
+    case Admin = 'admin';
 
     /**
      * Returns label => value choices for all roles.

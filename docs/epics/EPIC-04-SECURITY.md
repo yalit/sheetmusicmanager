@@ -1,7 +1,7 @@
 # Epic 4: Authentication & Security Layer
 
-**Branch**: `epic/04-security`
-**Status**: ⏳ Pending
+**Branch**: `epic/03-easyadmin`
+**Status**: ✅ Implemented
 **Estimated Effort**: 3-4 hours
 **Dependencies**: Epic 3 (Basic Admin)
 
@@ -23,9 +23,9 @@ Implement comprehensive authentication, authorization, and role-based access con
 - [x] Configure `security.yaml`
 - [x] Set password hasher to `auto` (bcrypt/argon2)
 - [x] Configure user provider using Member entity (property: email)
-- [ ] Configure firewall for /admin routes (form_login, logout, remember_me missing)
-- [ ] Set up access control rules (currently commented out)
-- [ ] Define role hierarchy
+- [x] Configure firewall for /admin routes (form_login, logout, remember_me)
+- [x] Set up access control rules
+- [x] Define role hierarchy
 
 **Technical Details**:
 
@@ -69,9 +69,9 @@ security:
         - { path: ^/admin, roles: ROLE_MEMBER }
 
     role_hierarchy:
-        ROLE_LIBRARIAN: ROLE_MEMBER
-        ROLE_CONDUCTOR: [ROLE_MEMBER, ROLE_LIBRARIAN]
-        ROLE_ADMIN: [ROLE_MEMBER, ROLE_LIBRARIAN, ROLE_CONDUCTOR]
+        ROLE_CONTRIBUTOR: ROLE_MEMBER
+        ROLE_LIBRARIAN: [ROLE_MEMBER, ROLE_CONTRIBUTOR]
+        ROLE_ADMIN: [ROLE_MEMBER, ROLE_CONTRIBUTOR, ROLE_LIBRARIAN]
 ```
 
 **Acceptance Criteria**:
@@ -218,36 +218,61 @@ class SecurityController extends AbstractController
 **Description**: Define role hierarchy and permissions structure.
 
 **Tasks**:
-- [ ] Define ROLE_MEMBER (base role)
-- [ ] Define ROLE_LIBRARIAN (can manage sheets)
-- [ ] Define ROLE_CONDUCTOR (can manage sheets + setlists)
-- [ ] Define ROLE_ADMIN (full access)
-- [ ] Document role permissions
+- [x] Define ROLE_MEMBER (base role — read-only access)
+- [x] Define ROLE_CONTRIBUTOR (can manage setlists)
+- [x] Define ROLE_LIBRARIAN (can manage sheets and persons)
+- [x] Define ROLE_ADMIN (full access including members)
+- [x] Document role permissions
 
 **Technical Details**:
 
-**Role Hierarchy** (already in security.yaml):
+**Role Hierarchy** (`config/packages/security.yaml`):
 ```yaml
 role_hierarchy:
-    ROLE_LIBRARIAN: ROLE_MEMBER
-    ROLE_CONDUCTOR: [ROLE_MEMBER, ROLE_LIBRARIAN]
-    ROLE_ADMIN: [ROLE_MEMBER, ROLE_LIBRARIAN, ROLE_CONDUCTOR]
+    ROLE_CONTRIBUTOR: ROLE_MEMBER
+    ROLE_LIBRARIAN: [ROLE_MEMBER, ROLE_CONTRIBUTOR]
+    ROLE_ADMIN: [ROLE_MEMBER, ROLE_CONTRIBUTOR, ROLE_LIBRARIAN]
 ```
 
-**Permission Matrix**:
+**Permission Matrix** (per CRUD action):
 
-| Role | View All | Manage Sheets | Manage Setlists | Manage Members | Manage Organizations |
-|------|----------|---------------|-----------------|----------------|---------------------|
-| ROLE_MEMBER | ✅ | ❌ | ❌ | ❌ | ❌ |
-| ROLE_LIBRARIAN | ✅ | ✅ | ❌ | ❌ | ❌ |
-| ROLE_CONDUCTOR | ✅ | ✅ | ✅ | ❌ | ❌ |
-| ROLE_ADMIN | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Entity | Action | ROLE_MEMBER | ROLE_CONTRIBUTOR | ROLE_LIBRARIAN | ROLE_ADMIN |
+|--------|--------|:-----------:|:----------------:|:--------------:|:----------:|
+| Sheet | INDEX | ✅ | ✅ | ✅ | ✅ |
+| Sheet | DETAIL | ❌ | ❌ | ❌ | ❌ |
+| Sheet | NEW | ❌ | ❌ | ✅ | ✅ |
+| Sheet | EDIT | ❌ | ✅ | ✅ | ✅ |
+| Sheet | DELETE | ❌ | ❌ | ✅ | ✅ |
+| Setlist | INDEX | ✅ | ✅ | ✅ | ✅ |
+| Setlist | DETAIL | ✅ | ✅ | ✅ | ✅ |
+| Setlist | NEW | ✅ | ✅ | ✅ | ✅ |
+| Setlist | EDIT | own only | ✅ | ✅ | ✅ |
+| Setlist | DELETE | own only | ✅ | ✅ | ✅ |
+| Person | INDEX | ✅ | ✅ | ✅ | ✅ |
+| Person | DETAIL | ✅ | ✅ | ✅ | ✅ |
+| Person | NEW | ❌ | ❌ | ✅ | ✅ |
+| Person | EDIT | ❌ | ❌ | ✅ | ✅ |
+| Person | DELETE | ❌ | ❌ | ✅ | ✅ |
+| PersonType | INDEX | ✅ | ✅ | ✅ | ✅ |
+| PersonType | DETAIL | ✅ | ✅ | ✅ | ✅ |
+| PersonType | NEW | ❌ | ❌ | ✅ | ✅ |
+| PersonType | EDIT | ❌ | ❌ | ✅ | ✅ |
+| PersonType | DELETE | ❌ | ❌ | ✅ | ✅ |
+| Member | INDEX | ❌ | ❌ | ❌ | ✅ |
+| Member | DETAIL | ❌ | ❌ | ❌ | ✅ |
+| Member | NEW | ❌ | ❌ | ❌ | ✅ |
+| Member | EDIT | ❌ | ❌ | ❌ | ✅ |
+| Member | DELETE | ❌ | ❌ | ❌ | ✅ |
+
+Notes:
+- Sheet DETAIL is disabled for all roles (no detail page for sheets).
+- Setlist EDIT/DELETE "own only" means ROLE_MEMBER can manage setlists they created
+  (matched via `createdBy` field against the authenticated user's email identifier).
 
 **Acceptance Criteria**:
 - Role hierarchy defined in security.yaml
 - Roles inherit permissions from lower roles
 - Permission matrix documented
-- Clear understanding of each role's capabilities
 
 **Deliverables**:
 - Documented role hierarchy
@@ -257,267 +282,103 @@ role_hierarchy:
 
 ### Story 4.4: Implement EasyAdmin Permission System
 
-**Description**: Configure permissions on CRUD actions based on roles.
+**Description**: Configure permissions on CRUD actions using Symfony Voters (one voter per entity).
 
 **Tasks**:
-- [ ] Configure permissions on Sheet CRUD actions
-- [ ] Configure permissions on Setlist CRUD actions
-- [ ] Configure permissions on Member CRUD actions
-- [ ] Configure permissions on Organization CRUD actions
-- [ ] Test each role's access
+- [x] Configure permissions on Sheet CRUD actions via SheetVoter
+- [x] Configure permissions on Setlist CRUD actions via SetlistVoter
+- [x] Configure permissions on Member CRUD actions via MemberVoter
+- [x] Configure permissions on Person CRUD actions via PersonVoter
+- [x] Configure permissions on PersonType CRUD actions via PersonTypeVoter
+- [x] Test each role's access
 
 **Technical Details**:
 
-**Sheet CRUD Controller** (`src/Controller/Admin/SheetCrudController.php`):
-```php
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+Permissions are wired through voter constants rather than raw role strings. Each controller delegates to its voter:
 
+```php
+// Example: SheetCrudController
 public function configureActions(Actions $actions): Actions
 {
     return $actions
-        ->setPermission(Action::INDEX, 'ROLE_MEMBER')
-        ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
-        ->setPermission(Action::NEW, 'ROLE_LIBRARIAN')
-        ->setPermission(Action::EDIT, 'ROLE_LIBRARIAN')
-        ->setPermission(Action::DELETE, 'ROLE_ADMIN');
-}
-```
-
-**Setlist CRUD Controller** (`src/Controller/Admin/SetlistCrudController.php`):
-```php
-public function configureActions(Actions $actions): Actions
-{
-    return $actions
-        ->setPermission(Action::INDEX, 'ROLE_MEMBER')
-        ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
-        ->setPermission(Action::NEW, 'ROLE_CONDUCTOR')
-        ->setPermission(Action::EDIT, 'ROLE_CONDUCTOR')
-        ->setPermission(Action::DELETE, 'ROLE_ADMIN');
-}
-```
-
-**Member CRUD Controller** (`src/Controller/Admin/MemberCrudController.php`):
-```php
-public function configureActions(Actions $actions): Actions
-{
-    return $actions
-        ->setPermission(Action::INDEX, 'ROLE_ADMIN')
-        ->setPermission(Action::DETAIL, 'ROLE_ADMIN')
-        ->setPermission(Action::NEW, 'ROLE_ADMIN')
-        ->setPermission(Action::EDIT, 'ROLE_ADMIN')
-        ->setPermission(Action::DELETE, 'ROLE_ADMIN');
-}
-```
-
-**Organization CRUD Controller** (`src/Controller/Admin/OrganizationCrudController.php`):
-```php
-public function configureActions(Actions $actions): Actions
-{
-    return $actions
-        ->setPermission(Action::INDEX, 'ROLE_ADMIN')
-        ->setPermission(Action::DETAIL, 'ROLE_ADMIN')
-        ->setPermission(Action::NEW, 'ROLE_ADMIN')
-        ->setPermission(Action::EDIT, 'ROLE_ADMIN')
-        ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+        ->setPermission(Action::INDEX,  SheetVoter::INDEX)
+        ->setPermission(Action::DETAIL, SheetVoter::DETAIL)
+        ->setPermission(Action::NEW,    SheetVoter::NEW)
+        ->setPermission(Action::EDIT,   SheetVoter::EDIT)
+        ->setPermission(Action::DELETE, SheetVoter::DELETE);
 }
 ```
 
 **Acceptance Criteria**:
-- Permissions configured on all CRUD actions
-- ROLE_MEMBER can only view
-- ROLE_LIBRARIAN can manage sheets
-- ROLE_CONDUCTOR can manage sheets and setlists
-- ROLE_ADMIN has full access
-- Unauthorized actions show 403 error
+- [x] Permissions configured on all CRUD actions
+- [x] ROLE_MEMBER can view sheets/setlists/persons/person types; can create and manage own setlists
+- [x] ROLE_CONTRIBUTOR can additionally edit sheets and manage any setlist
+- [x] ROLE_LIBRARIAN can additionally create/edit/delete sheets, persons, person types
+- [x] ROLE_ADMIN has full access including members
+- [x] Unauthorized actions show 403 error
 
 **Deliverables**:
-- Updated CRUD controllers with permission configuration
+- [x] Updated CRUD controllers with voter-based permission configuration
 
 ---
 
 ### Story 4.5: Create Security Voters
 
-**Description**: Implement voters for organization-scoped access control.
+**Description**: One voter per entity covering all five CRUD actions (INDEX, DETAIL, NEW, EDIT, DELETE).
 
 **Tasks**:
-- [ ] Create SheetVoter for organization-based access
-- [ ] Create SetlistVoter for organization-based + status access
-- [ ] Implement voting logic
-- [ ] Test voter logic with different users
+- [x] Create SheetVoter
+- [x] Create SetlistVoter (with ownership logic for EDIT/DELETE)
+- [x] Create MemberVoter
+- [x] Create PersonVoter
+- [x] Create PersonTypeVoter
+- [x] Wire voters into CRUD controllers via `setPermission()`
+- [x] Test voter logic with DataProvider-based integration tests
 
 **Technical Details**:
 
-**Sheet Voter** (`src/Security/Voter/SheetVoter.php`):
+**`supports()` pattern**: EasyAdmin calls the voter with three different subject shapes:
+- `null` when checking whether to display the NEW toolbar button
+- `EntityClass::class` (string) when checking INDEX and NEW page access
+- entity instance for DETAIL, EDIT, and DELETE
+
 ```php
-<?php
-
-namespace App\Security\Voter;
-
-use App\Entity\Sheet;
-use App\Entity\Member;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\Security;
-
-class SheetVoter extends Voter
+protected function supports(string $attribute, mixed $subject): bool
 {
-    public const VIEW = 'VIEW';
-    public const EDIT = 'EDIT';
-    public const DELETE = 'DELETE';
-
-    public function __construct(private Security $security)
-    {
-    }
-
-    protected function supports(string $attribute, mixed $subject): bool
-    {
-        return in_array($attribute, [self::VIEW, self::EDIT, self::DELETE])
-            && $subject instanceof Sheet;
-    }
-
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-    {
-        $user = $token->getUser();
-
-        if (!$user instanceof Member) {
-            return false;
-        }
-
-        /** @var Sheet $sheet */
-        $sheet = $subject;
-
-        // Users can only access sheets from their organization
-        if ($sheet->getOrganization() !== $user->getOrganization()) {
-            return false;
-        }
-
-        return match($attribute) {
-            self::VIEW => $this->canView($sheet, $user),
-            self::EDIT => $this->canEdit($sheet, $user),
-            self::DELETE => $this->canDelete($sheet, $user),
-            default => false,
-        };
-    }
-
-    private function canView(Sheet $sheet, Member $user): bool
-    {
-        // All members can view sheets from their organization
-        return $this->security->isGranted('ROLE_MEMBER');
-    }
-
-    private function canEdit(Sheet $sheet, Member $user): bool
-    {
-        // Librarians and above can edit
-        return $this->security->isGranted('ROLE_LIBRARIAN');
-    }
-
-    private function canDelete(Sheet $sheet, Member $user): bool
-    {
-        // Only admins can delete
-        return $this->security->isGranted('ROLE_ADMIN');
-    }
+    return ($attribute === self::NEW && $subject === null)
+        || (in_array($attribute, [self::INDEX, self::NEW]) && $subject === Sheet::class)
+        || (in_array($attribute, [self::DETAIL, self::EDIT, self::DELETE]) && $subject instanceof Sheet);
 }
 ```
 
-**Setlist Voter** (`src/Security/Voter/SetlistVoter.php`):
+**SetlistVoter** uses ownership logic for EDIT and DELETE: any user with `ROLE_CONTRIBUTOR` may manage any setlist; a plain `ROLE_MEMBER` may only manage setlists where `createdBy` matches their identifier.
+
 ```php
-<?php
-
-namespace App\Security\Voter;
-
-use App\Entity\Setlist;
-use App\Entity\Member;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\Security;
-
-class SetlistVoter extends Voter
+private function voteOnOwned(mixed $subject, TokenInterface $token): bool
 {
-    public const VIEW = 'VIEW';
-    public const EDIT = 'EDIT';
-    public const DELETE = 'DELETE';
-    public const FINALIZE = 'FINALIZE';
-    public const MARK_PERFORMED = 'MARK_PERFORMED';
-
-    public function __construct(private Security $security)
-    {
+    if ($this->security->isGranted('ROLE_CONTRIBUTOR')) {
+        return true;
     }
-
-    protected function supports(string $attribute, mixed $subject): bool
-    {
-        return in_array($attribute, [self::VIEW, self::EDIT, self::DELETE, self::FINALIZE, self::MARK_PERFORMED])
-            && $subject instanceof Setlist;
+    $user = $token->getUser();
+    if (!$user instanceof UserInterface || !$subject instanceof Setlist) {
+        return false;
     }
-
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-    {
-        $user = $token->getUser();
-
-        if (!$user instanceof Member) {
-            return false;
-        }
-
-        /** @var Setlist $setlist */
-        $setlist = $subject;
-
-        // Users can only access setlists from their organization
-        if ($setlist->getOrganization() !== $user->getOrganization()) {
-            return false;
-        }
-
-        return match($attribute) {
-            self::VIEW => $this->canView($setlist, $user),
-            self::EDIT => $this->canEdit($setlist, $user),
-            self::DELETE => $this->canDelete($setlist, $user),
-            self::FINALIZE => $this->canFinalize($setlist, $user),
-            self::MARK_PERFORMED => $this->canMarkPerformed($setlist, $user),
-            default => false,
-        };
-    }
-
-    private function canView(Setlist $setlist, Member $user): bool
-    {
-        return $this->security->isGranted('ROLE_MEMBER');
-    }
-
-    private function canEdit(Setlist $setlist, Member $user): bool
-    {
-        // Can only edit if draft status and has ROLE_CONDUCTOR
-        return $setlist->getStatus() === 'draft'
-            && $this->security->isGranted('ROLE_CONDUCTOR');
-    }
-
-    private function canDelete(Setlist $setlist, Member $user): bool
-    {
-        // Can only delete drafts and must be admin
-        return $setlist->getStatus() === 'draft'
-            && $this->security->isGranted('ROLE_ADMIN');
-    }
-
-    private function canFinalize(Setlist $setlist, Member $user): bool
-    {
-        return $setlist->getStatus() === 'draft'
-            && $this->security->isGranted('ROLE_CONDUCTOR');
-    }
-
-    private function canMarkPerformed(Setlist $setlist, Member $user): bool
-    {
-        return $setlist->getStatus() === 'finalized'
-            && $this->security->isGranted('ROLE_CONDUCTOR');
-    }
+    return $subject->getCreatedBy() === $user->getUserIdentifier();
 }
 ```
 
 **Acceptance Criteria**:
-- Voters created for Sheet and Setlist
-- Organization scoping enforced in voters
-- Status-based access for setlists implemented
-- Voters tested with different user scenarios
+- [x] One voter per entity, covering all five actions
+- [x] Voter constants used as permission strings in CRUD controllers
+- [x] Setlist ownership enforced for EDIT/DELETE
+- [x] Integration tests cover all role × action combinations
 
 **Deliverables**:
-- `src/Security/Voter/SheetVoter.php`
-- `src/Security/Voter/SetlistVoter.php`
+- [x] `src/Security/Voter/SheetVoter.php`
+- [x] `src/Security/Voter/SetlistVoter.php`
+- [x] `src/Security/Voter/MemberVoter.php`
+- [x] `src/Security/Voter/PersonVoter.php`
+- [x] `src/Security/Voter/PersonTypeVoter.php`
 
 ---
 
@@ -525,272 +386,116 @@ class SetlistVoter extends Voter
 
 **Description**: Add role checks to custom actions and display actions conditionally.
 
+**Status**: ⏳ Pending — no custom actions exist yet. To be revisited when custom actions are introduced in later epics.
+
 **Tasks**:
 - [ ] Add permission checks to custom actions
-- [ ] Configure displayIf conditions based on roles
+- [ ] Configure `displayIf` conditions based on voter checks
 - [ ] Test action visibility with different roles
-- [ ] Ensure unauthorized access returns 403
-
-**Technical Details**:
-
-**Example Custom Action with Role Check**:
-```php
-// In CRUD controller
-public function configureActions(Actions $actions): Actions
-{
-    $exportAction = Action::new('export', 'Export')
-        ->linkToCrudAction('export')
-        ->setIcon('fa fa-download')
-        ->displayIf(fn () => $this->isGranted('ROLE_LIBRARIAN'));
-
-    $archiveAction = Action::new('archive', 'Archive')
-        ->linkToCrudAction('archive')
-        ->setIcon('fa fa-archive')
-        ->displayIf(fn () => $this->isGranted('ROLE_ADMIN'));
-
-    return $actions
-        ->add(Crud::PAGE_INDEX, $exportAction)
-        ->add(Crud::PAGE_DETAIL, $archiveAction);
-}
-
-// Action method with authorization check
-public function archive(AdminContext $context): Response
-{
-    $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-    $sheet = $context->getEntity()->getInstance();
-    $sheet->setStatus('archived');
-    $this->entityManager->flush();
-
-    return $this->redirect($context->getReferrer());
-}
-```
-
-**Acceptance Criteria**:
-- Custom actions protected with role checks
-- Actions display only for authorized roles
-- Unauthorized direct access blocked
-- Clear error messages for unauthorized attempts
-
-**Deliverables**:
-- Protected custom actions
-- Conditional action display
+- [ ] Ensure unauthorized direct access returns 403
 
 ---
 
-### Story 4.7: Create Test Users
+### Story 4.7: Create Test Fixtures
 
-**Description**: Create test users for each role for demonstration purposes.
+**Description**: Create Doctrine fixtures for all entities to support automated testing and local development.
 
 **Tasks**:
-- [ ] Create fixtures for test users
-- [ ] One user per role type
-- [ ] Users belong to different organizations
-- [ ] Document test user credentials
-- [ ] Seed users via fixtures
+- [x] Create `MemberFixtures` — one member per role (`member/contributor/librarian/admin @sheetmusic.test`)
+- [x] Create `PersonTypeFixtures` — Composer, Arranger, Conductor
+- [x] Create `PersonFixtures` — Bach, Mozart, Brahms
+- [x] Create `SheetFixtures` — Toccata and Fugue, Eine Kleine Nachtmusik
+- [x] Create `SetlistFixtures` — one per role owner (Member/Contributor/Librarian Setlist), `createdBy` set via raw SQL
+- [x] Wire fixture loading into `test-init` task (`Taskfile.yml`)
 
-**Technical Details**:
+**Fixture credentials** (password: `password` for all):
 
-**Fixtures** (`src/DataFixtures/MemberFixtures.php`):
-```php
-<?php
-
-namespace App\DataFixtures;
-
-use App\Entity\Member;
-use App\Entity\Organization;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
-class MemberFixtures extends Fixture implements DependentFixtureInterface
-{
-    public function __construct(
-        private UserPasswordHasherInterface $passwordHasher
-    ) {}
-
-    public function load(ObjectManager $manager): void
-    {
-        $choirOrg = $this->getReference('org-choir');
-        $bandOrg = $this->getReference('org-band');
-
-        // ROLE_MEMBER - St. Mary's Choir
-        $member = new Member();
-        $member->setName('John Member');
-        $member->setEmail('member@stmarys.org');
-        $member->setPassword($this->passwordHasher->hashPassword($member, 'password123'));
-        $member->setRoles(['ROLE_MEMBER']);
-        $member->setOrganization($choirOrg);
-        $manager->persist($member);
-
-        // ROLE_LIBRARIAN - St. Mary's Choir
-        $librarian = new Member();
-        $librarian->setName('Sarah Librarian');
-        $librarian->setEmail('librarian@stmarys.org');
-        $librarian->setPassword($this->passwordHasher->hashPassword($librarian, 'password123'));
-        $librarian->setRoles(['ROLE_LIBRARIAN']);
-        $librarian->setOrganization($choirOrg);
-        $manager->persist($librarian);
-
-        // ROLE_CONDUCTOR - St. Mary's Choir
-        $conductor = new Member();
-        $conductor->setName('Michael Conductor');
-        $conductor->setEmail('conductor@stmarys.org');
-        $conductor->setPassword($this->passwordHasher->hashPassword($conductor, 'password123'));
-        $conductor->setRoles(['ROLE_CONDUCTOR']);
-        $conductor->setOrganization($choirOrg);
-        $manager->persist($conductor);
-
-        // ROLE_ADMIN - City Jazz Band
-        $admin = new Member();
-        $admin->setName('Admin User');
-        $admin->setEmail('admin@cityjazz.org');
-        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'password123'));
-        $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setOrganization($bandOrg);
-        $manager->persist($admin);
-
-        $manager->flush();
-    }
-
-    public function getDependencies(): array
-    {
-        return [
-            OrganizationFixtures::class,
-        ];
-    }
-}
-```
-
-**Test User Credentials Document** (`docs/TEST_USERS.md`):
-```markdown
-# Test Users
-
-## St. Mary's Choir (Organization ID: 1)
-
-### Read-Only Member
-- Email: member@stmarys.org
-- Password: password123
-- Role: ROLE_MEMBER
-- Can: View all entities
-- Cannot: Create/edit/delete anything
-
-### Librarian
-- Email: librarian@stmarys.org
-- Password: password123
-- Role: ROLE_LIBRARIAN
-- Can: View all, manage sheets
-- Cannot: Manage setlists, members, organizations
-
-### Conductor
-- Email: conductor@stmarys.org
-- Password: password123
-- Role: ROLE_CONDUCTOR
-- Can: View all, manage sheets and setlists
-- Cannot: Manage members, organizations
-
-## City Jazz Band (Organization ID: 2)
-
-### Administrator
-- Email: admin@cityjazz.org
-- Password: password123
-- Role: ROLE_ADMIN
-- Can: Everything
-```
+| Email | Role |
+|-------|------|
+| `member@sheetmusic.test` | ROLE_MEMBER |
+| `contributor@sheetmusic.test` | ROLE_CONTRIBUTOR |
+| `librarian@sheetmusic.test` | ROLE_LIBRARIAN |
+| `admin@sheetmusic.test` | ROLE_ADMIN |
 
 **Acceptance Criteria**:
-- Four test users created
-- One user per role type
-- Two different organizations represented
-- Users can log in successfully
-- Each user has appropriate access level
-- Credentials documented
+- [x] One fixture member per role
+- [x] Fixtures loaded automatically by `task test-init`
+- [x] Tests rely solely on fixture data (no test-created entities)
 
 **Deliverables**:
-- `src/DataFixtures/MemberFixtures.php`
-- `docs/TEST_USERS.md`
+- [x] `src/DataFixtures/MemberFixtures.php`
+- [x] `src/DataFixtures/PersonTypeFixtures.php`
+- [x] `src/DataFixtures/PersonFixtures.php`
+- [x] `src/DataFixtures/SheetFixtures.php`
+- [x] `src/DataFixtures/SetlistFixtures.php`
 
 ---
 
 ## Epic Acceptance Criteria
 
-- [ ] Security bundle configured
-- [ ] Login/logout working
-- [ ] Remember me functionality working
-- [ ] Role hierarchy defined
-- [ ] Permissions configured on all CRUD actions
-- [ ] Voters enforce organization-scoped access
-- [ ] Custom actions protected by roles
-- [ ] Test users created for all roles
-- [ ] All roles tested and working correctly
-- [ ] Users only see their organization's data
-- [ ] Unauthorized access properly blocked
+- [x] Security bundle configured
+- [x] Login/logout working
+- [x] Remember me functionality working
+- [x] Role hierarchy defined (ROLE_CONTRIBUTOR, ROLE_LIBRARIAN, ROLE_ADMIN)
+- [x] Permissions configured on all CRUD actions via voters
+- [x] Voters enforce per-entity access control (including NEW button visibility)
+- [x] Test fixtures created for all four roles and all entities
+- [x] All roles tested with DataProvider-based integration tests (access + UI action visibility)
+- [x] Unauthorized access returns 403
+- [ ] Custom actions protected (pending Story 4.6)
 
 ---
 
-## Testing Checklist
+## Remaining
 
-Manual testing with each test user:
+### Story 4.6 — Custom action protection
+No custom actions exist yet. Once custom CRUD actions are added in later epics, each one must:
+- Use `->setPermission()` with a voter constant, or `->displayIf()` with a role check
+- Have a corresponding `denyAccessUnlessGranted()` guard in the action method
+- Be covered by a `testXxxDisplayOnIndex` test in the relevant test class
 
+---
+
+## Testing
+
+Automated integration tests cover all role × action combinations for every CRUD controller.
+Each test class uses PHPUnit `#[DataProvider]` and covers:
+- **Access** (`testIndexAccess`, `testNewAccess`, `testEditAccess`, `testDetailAccess`, `testDeleteAccess`)
+- **UI visibility** (`testNewDisplayOnIndex`, `testEditDisplayOnIndex`, `testDeleteAccess` on index row)
+
+Test files:
+- `tests/Admin/Controller/SheetCrudControllerTest.php`
+- `tests/Admin/Controller/SetlistCrudControllerTest.php`
+- `tests/Admin/Controller/MemberCrudControllerTest.php`
+- `tests/Admin/Controller/PersonCrudControllerTest.php`
+- `tests/Admin/Controller/PersonTypeCrudControllerTest.php`
+
+Run tests after initialising the test database:
 ```bash
-# Start server
-symfony server:start
-
-# Test ROLE_MEMBER (member@stmarys.org / password123)
-- [ ] Can log in
-- [ ] Can view sheets, setlists
-- [ ] Cannot create/edit sheets
-- [ ] Cannot create/edit setlists
-- [ ] Cannot access members/organizations
-
-# Test ROLE_LIBRARIAN (librarian@stmarys.org / password123)
-- [ ] Can log in
-- [ ] Can view sheets, setlists
-- [ ] Can create/edit/delete sheets
-- [ ] Cannot create/edit setlists
-- [ ] Cannot access members/organizations
-
-# Test ROLE_CONDUCTOR (conductor@stmarys.org / password123)
-- [ ] Can log in
-- [ ] Can view all entities
-- [ ] Can manage sheets
-- [ ] Can manage setlists
-- [ ] Cannot access members/organizations
-
-# Test ROLE_ADMIN (admin@cityjazz.org / password123)
-- [ ] Can log in
-- [ ] Can access all entities
-- [ ] Can manage everything
-- [ ] Only sees City Jazz Band data (multi-tenancy)
-
-# Test Multi-tenancy
-- [ ] Member from choir org cannot see band data
-- [ ] Admin from band org cannot see choir data
+task test-init   # drops DB, runs migrations, loads fixtures
+task tests
 ```
 
 ---
 
 ## Deliverables
 
-- [ ] `config/packages/security.yaml`
-- [ ] `src/Controller/SecurityController.php`
-- [ ] `templates/security/login.html.twig`
-- [ ] `src/Security/Voter/SheetVoter.php`
-- [ ] `src/Security/Voter/SetlistVoter.php`
-- [ ] `src/DataFixtures/MemberFixtures.php`
-- [ ] `docs/TEST_USERS.md`
-- [ ] Updated CRUD controllers with permissions
-- [ ] Working authentication and authorization system
-
----
-
-## Notes
-
-- Role hierarchy allows for clean permission inheritance
-- Voters provide fine-grained access control beyond simple role checks
-- Test users enable effective demonstration of security features during talk
-- Organization scoping in voters complements multi-tenancy implementation (Epic 5)
+- [x] `config/packages/security.yaml`
+- [x] `src/Controller/SecurityController.php`
+- [x] `templates/security/login.html.twig`
+- [x] `src/Security/Voter/SheetVoter.php`
+- [x] `src/Security/Voter/SetlistVoter.php`
+- [x] `src/Security/Voter/MemberVoter.php`
+- [x] `src/Security/Voter/PersonVoter.php`
+- [x] `src/Security/Voter/PersonTypeVoter.php`
+- [x] `src/DataFixtures/MemberFixtures.php`
+- [x] `src/DataFixtures/PersonTypeFixtures.php`
+- [x] `src/DataFixtures/PersonFixtures.php`
+- [x] `src/DataFixtures/SheetFixtures.php`
+- [x] `src/DataFixtures/SetlistFixtures.php`
+- [x] Updated CRUD controllers with voter-based permission configuration
+- [x] Working authentication and authorization system
+- [ ] Custom action protection (Story 4.6)
 
 ---
 

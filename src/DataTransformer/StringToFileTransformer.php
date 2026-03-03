@@ -35,7 +35,7 @@ final readonly class StringToFileTransformer implements DataTransformerInterface
             return new File($filename);
         }
 
-        throw new TransformationFailedException(sprintf("File '%s' does not exist.", $value));
+        throw new TransformationFailedException(sprintf("File '%s' does not exist.", $filename));
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Member;
 use App\Enum\MemberRole;
+use App\Security\Voter\MemberVoter;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -14,6 +15,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
+/**
+ * @extends AbstractCrudController<Member>
+ */
 class MemberCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -33,11 +37,11 @@ class MemberCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->setPermission(Action::INDEX,  'ROLE_LIBRARIAN')
-            ->setPermission(Action::DETAIL, 'ROLE_LIBRARIAN')
-            ->setPermission(Action::NEW,    'ROLE_ADMIN')
-            ->setPermission(Action::EDIT,   'ROLE_LIBRARIAN')
-            ->setPermission(Action::DELETE, 'ROLE_ADMIN')
+            ->setPermission(Action::INDEX,  MemberVoter::INDEX)
+            ->setPermission(Action::DETAIL, MemberVoter::DETAIL)
+            ->setPermission(Action::NEW,    MemberVoter::NEW)
+            ->setPermission(Action::EDIT,   MemberVoter::EDIT)
+            ->setPermission(Action::DELETE, MemberVoter::DELETE)
         ;
     }
 

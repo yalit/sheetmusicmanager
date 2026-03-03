@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\PersonType;
+use App\Security\Voter\PersonTypeVoter;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -31,11 +32,11 @@ class PersonTypeCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->setPermission(Action::INDEX,  'ROLE_MEMBER')
-            ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
-            ->setPermission(Action::NEW,    'ROLE_LIBRARIAN')
-            ->setPermission(Action::EDIT,   'ROLE_LIBRARIAN')
-            ->setPermission(Action::DELETE, 'ROLE_LIBRARIAN')
+            ->setPermission(Action::INDEX,  PersonTypeVoter::INDEX)
+            ->setPermission(Action::DETAIL, PersonTypeVoter::DETAIL)
+            ->setPermission(Action::NEW,    PersonTypeVoter::NEW)
+            ->setPermission(Action::EDIT,   PersonTypeVoter::EDIT)
+            ->setPermission(Action::DELETE, PersonTypeVoter::DELETE)
         ;
     }
 

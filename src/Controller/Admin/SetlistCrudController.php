@@ -40,9 +40,9 @@ class SetlistCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->setPermission(Action::INDEX,  'ROLE_MEMBER')
-            ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
-            ->setPermission(Action::NEW,    'ROLE_MEMBER')
+            ->setPermission(Action::INDEX,  SetlistVoter::INDEX)
+            ->setPermission(Action::DETAIL, SetlistVoter::DETAIL)
+            ->setPermission(Action::NEW,    SetlistVoter::NEW)
             ->setPermission(Action::EDIT,   SetlistVoter::EDIT)
             ->setPermission(Action::DELETE, SetlistVoter::DELETE)
         ;

@@ -24,8 +24,9 @@ services:
 
     App\Admin\Type\SheetFileType:
         arguments:
-            $rootDir: '%kernel.project_dir%'
+            $rootDir: '%kernel.project_dir%/%env(ROOT_DIR_FOR_FILE_UPLOAD)%'
 
     App\Controller\Admin\SheetCrudController:
         arguments:
-            $projectDir: '%kernel.project_dir%'
+            $projectDir: '%kernel.project_dir%/%env(ROOT_DIR_FOR_FILE_UPLOAD)%'
+

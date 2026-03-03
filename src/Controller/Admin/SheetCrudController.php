@@ -7,6 +7,7 @@ use App\Admin\Fields\CollectionTableField;
 use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
 use App\Repository\SheetRepository;
+use App\Security\Voter\SheetVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -54,11 +55,11 @@ class SheetCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->setPermission(Action::INDEX,  'ROLE_MEMBER')
-            ->setPermission(Action::DETAIL, 'ROLE_MEMBER')
-            ->setPermission(Action::NEW,    'ROLE_LIBRARIAN')
-            ->setPermission(Action::EDIT,   'ROLE_CONTRIBUTOR')
-            ->setPermission(Action::DELETE, 'ROLE_LIBRARIAN')
+            ->setPermission(Action::INDEX,  SheetVoter::INDEX)
+            ->setPermission(Action::DETAIL, SheetVoter::DETAIL)
+            ->setPermission(Action::NEW,    SheetVoter::NEW)
+            ->setPermission(Action::EDIT,   SheetVoter::EDIT)
+            ->setPermission(Action::DELETE, SheetVoter::DELETE)
         ;
     }
 
@@ -71,7 +72,7 @@ class SheetCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->hideOnForm();
         yield FormField::addColumn(8);
-        yield FormField::addPanel("General");
+        yield FormField::addFieldset("General");
         yield TextField::new('title', 'Titre')->setColumns(8);
 
         yield PDFField::new('files', 'Fichier PDF')
@@ -79,7 +80,7 @@ class SheetCrudController extends AbstractCrudController
             ->setRequired($pageName === Crud::PAGE_NEW);
 
         yield FormField::addColumn(4);
-        yield FormField::addPanel("Details");
+        yield FormField::addFieldset("Details");
         yield ChoiceAutoCompleteStringField::new('refs')
             ->setChoices([$this->sheetRepository, 'getAllRefs']);
         yield ChoiceAutoCompleteStringField::new('tags')
