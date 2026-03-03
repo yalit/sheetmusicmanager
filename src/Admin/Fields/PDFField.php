@@ -30,9 +30,12 @@ class PDFField implements FieldInterface
             ;
     }
 
-    public function setUploadDir(string $uploadDir): self
+    /**
+     * @param array<array{name: string, size: string, web_path: string}> $data
+     */
+    public function setExistingFiles(array $data): self
     {
-        $this->setFormTypeOption('upload_dir', $uploadDir);
+        $this->setFormTypeOption('existing_files', $data);
         return $this;
     }
 }

@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -50,6 +51,18 @@ class Sheet
      */
     #[ORM\Column(type: Types::SIMPLE_ARRAY)]
     private array $files = [];
+
+    /**
+     * @var array<\Symfony\Component\HttpFoundation\File\UploadedFile>
+     */
+    #[Assert\All([
+        new Assert\File(
+            maxSize: '10M',
+            mimeTypes: ['application/pdf'],
+            mimeTypesMessage: 'Only PDF files are accepted.',
+        )
+    ])]
+    private array $uploadedFiles = [];
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Length(max: 255)]
@@ -227,11 +240,20 @@ class Sheet
     }
 
     /**
-     * @return string[]
+     * @return array<\Symfony\Component\HttpFoundation\File\UploadedFile>
      */
     public function getUploadedFiles(): array
     {
-        return $this->files;
+        return $this->uploadedFiles;
+    }
+
+    /**
+     * @param array<\Symfony\Component\HttpFoundation\File\UploadedFile> $files
+     */
+    public function setUploadedFiles(array $files): static
+    {
+        $this->uploadedFiles = $files;
+        return $this;
     }
 
     public function getFullPath(): ?string
