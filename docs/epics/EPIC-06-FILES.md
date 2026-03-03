@@ -19,18 +19,18 @@ PDF file upload, storage and management for the Sheet entity.
 Custom implementation chosen over VichUploaderBundle.
 
 - `src/Admin/Fields/PDFField.php` — EasyAdmin field factory
-- `src/Admin/Type/SheetFileType.php` — form type (extends FileType, multiple PDFs)
-- `src/DataTransformer/StringToFileTransformer.php` — `string[]` ↔ `File[]`
-- Upload destination: `public/uploads/sheets/`
+- `src/Admin/Type/SheetFileType.php` — thin form type (extends FileType, multiple PDFs, no transformer)
+- Upload destination configured via `SHEET_UPLOAD_DIR` env var (default `public/uploads/sheets/`)
 
 ---
 
 ### Story 6.2: Sheet PDF Upload ✅
 
-- `Sheet.files` — `SIMPLE_ARRAY` of filenames
-- `PDFField::new('files')` used in `SheetCrudController`
-- Multiple files supported
-- `client-side: accept="application/pdf"`
+- `Sheet.files` — `SIMPLE_ARRAY` of filenames (display/index)
+- `Sheet.uploadedFiles` — transient `array` of `UploadedFile` (form binding)
+- `PDFField::new('files')` for index/detail; `PDFField::new('uploadedFiles')` for forms
+- File I/O handled in `SheetCrudController::persistEntity()` / `updateEntity()`
+- Multiple files supported; `accept="application/pdf"` enforced client-side
 
 ---
 
@@ -54,12 +54,11 @@ Organisation entity deferred with Epic 5.
 
 ### Story 6.6: File Validation ✅
 
-Server-side validation added in `SheetFileType` via a `FormEvents::SUBMIT` listener:
+Standard Symfony constraint on the transient `Sheet::$uploadedFiles` property:
 
-- MIME type must be `application/pdf` (checked via `finfo`, not client header)
-- Max size: 10 MB
-- Invalid files are stripped from the event data **before** `reverseTransform()` runs,
-  so nothing is written to disk when validation fails.
+- `#[Assert\All([new Assert\File(maxSize: '10M', mimeTypes: ['application/pdf'])])]`
+- Validated by the form framework at submit time — no file is moved to disk if validation fails
+- Covered by `tests/Entity/SheetUploadValidationTest.php`
 
 ---
 
