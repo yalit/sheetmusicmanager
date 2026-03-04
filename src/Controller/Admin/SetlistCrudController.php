@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Action\DuplicateSetlistAction;
 use App\Admin\Fields\CollectionTableField;
 use App\Entity\Setlist;
 use App\Security\Voter\SetlistVoter;
@@ -32,7 +33,7 @@ class SetlistCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Setlist')
             ->setEntityLabelInPlural('Setlists')
-            ->setDefaultSort(['date' => 'DESC'])
+            ->setDefaultSort(['id' => 'DESC'])
             ->setSearchFields(['title'])
         ;
     }
@@ -40,6 +41,7 @@ class SetlistCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
+            ->add(Crud::PAGE_INDEX, DuplicateSetlistAction::new())
             ->setPermission(Action::INDEX,  SetlistVoter::INDEX)
             ->setPermission(Action::DETAIL, SetlistVoter::DETAIL)
             ->setPermission(Action::NEW,    SetlistVoter::NEW)
@@ -71,7 +73,7 @@ class SetlistCrudController extends AbstractCrudController
     private function syncItemPositions(Setlist $setlist): void
     {
         $position = 1;
-        foreach ($setlist->getItem() as $item) {
+        foreach ($setlist->getItems() as $item) {
             $item->setPosition($position++);
         }
     }
@@ -81,7 +83,7 @@ class SetlistCrudController extends AbstractCrudController
         yield IdField::new('id')->hideOnForm();
         yield TextField::new('title', 'Title');
         yield DateField::new('date', 'Date');
-        yield CollectionTableField::new('item', 'Items')
+        yield CollectionTableField::new('items', 'Items')
             ->useEntryCrudForm(SetlistItemCrudController::class)
             ->allowAdd()
             ->allowDelete()

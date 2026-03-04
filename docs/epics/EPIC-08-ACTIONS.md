@@ -40,7 +40,7 @@ $duplicate = Action::new('duplicate', 'Duplicate')
     ->linkToCrudAction('duplicate')
     ->setIcon('fa fa-copy')
     ->addCssClass('btn btn-secondary')
-    ->displayAsLink();
+    ->renderAsLink();
 
 return $actions
     ->add(Crud::PAGE_INDEX, $duplicate)
@@ -154,7 +154,7 @@ $generatePdf = Action::new('generatePdf', 'Export PDF')
     ->linkToCrudAction('generatePdf')
     ->setIcon('fa fa-file-pdf')
     ->addCssClass('btn btn-secondary')
-    ->displayAsLink();
+    ->renderAsLink();
 
 return $actions
     ->add(Crud::PAGE_INDEX, $generatePdf)
