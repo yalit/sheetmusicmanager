@@ -2,11 +2,12 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Action\AddSheetsToSetlistAction;
 use App\Admin\Fields\ChoiceAutoCompleteStringField;
 use App\Admin\Fields\CollectionTableField;
 use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
-use App\Filter\TagFilter;
+use App\Filter\HasPdfFilter;
 use App\Repository\SheetRepository;
 use App\Security\Voter\SheetVoter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +20,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use App\Filter\HasPdfFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -35,8 +35,7 @@ class SheetCrudController extends AbstractCrudController
         private readonly Filesystem      $filesystem,
         private readonly string          $projectDir,
         private readonly string          $uploadDir,
-    )
-    {
+    ) {
     }
 
     public static function getEntityFqcn(): string
@@ -55,7 +54,9 @@ class SheetCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+
         return $actions
+            ->addBatchAction(AddSheetsToSetlistAction::new())
             ->setPermission(Action::INDEX,  SheetVoter::INDEX)
             ->setPermission(Action::DETAIL, SheetVoter::DETAIL)
             ->setPermission(Action::NEW,    SheetVoter::NEW)
@@ -66,11 +67,6 @@ class SheetCrudController extends AbstractCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
-        $getTagChoices = function () {
-            $tags = $this->sheetRepository->getAllTags();
-            usort($tags, fn($a, $b) => strcmp($a, $b));
-            return array_combine($tags, $tags);
-        };
         return $filters
             ->add(TextFilter::new('title'))
             ->add(HasPdfFilter::new('files', 'Has PDF'))
