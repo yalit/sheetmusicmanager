@@ -10,6 +10,7 @@ use App\Entity\Sheet;
 use App\Filter\HasPdfFilter;
 use App\Repository\SheetRepository;
 use App\Security\Voter\SheetVoter;
+use App\Storage\SheetFileStorage;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -21,7 +22,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -30,11 +30,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class SheetCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly SheetRepository $sheetRepository,
-        private readonly RequestStack    $requestStack,
-        private readonly Filesystem      $filesystem,
-        private readonly string          $projectDir,
-        private readonly string          $uploadDir,
+        private readonly SheetRepository  $sheetRepository,
+        private readonly RequestStack     $requestStack,
+        private readonly SheetFileStorage $storage,
     ) {
     }
 
@@ -121,9 +119,7 @@ class SheetCrudController extends AbstractCrudController
         $request = $this->requestStack->getCurrentRequest();
         $removed = json_decode($request?->request->get('app_pdf_field_removed', '[]') ?: '[]', true);
         foreach ($removed as $filename) {
-            $this->filesystem->remove(
-                $this->projectDir . DIRECTORY_SEPARATOR . $this->uploadDir . DIRECTORY_SEPARATOR . $filename
-            );
+            $this->storage->delete($filename);
         }
 
         $kept = json_decode($request?->request->get('app_pdf_field_kept', '[]') ?: '[]', true);
@@ -137,9 +133,7 @@ class SheetCrudController extends AbstractCrudController
     {
         $filenames = [];
         foreach ($entityInstance->getUploadedFiles() as $file) {
-            $filename = $file->getClientOriginalName();
-            $file->move($this->projectDir . DIRECTORY_SEPARATOR . $this->uploadDir, $filename);
-            $filenames[] = $filename;
+            $filenames[] = $this->storage->save($file);
         }
         $entityInstance->setUploadedFiles([]);
         return $filenames;
@@ -152,15 +146,14 @@ class SheetCrudController extends AbstractCrudController
             return [];
         }
 
-        $webPrefix = '/' . preg_replace('#^public/#', '', $this->uploadDir);
         $data = [];
         foreach ($entity->getFiles() as $filename) {
-            $fullPath = $this->projectDir . DIRECTORY_SEPARATOR . $this->uploadDir . DIRECTORY_SEPARATOR . $filename;
+            $fullPath = $this->storage->absolutePath($filename);
             $size = is_file($fullPath) ? filesize($fullPath) : 0;
             $data[] = [
                 'name' => $filename,
                 'size' => $this->formatFileSize($size),
-                'web_path' => $webPrefix . '/' . $filename,
+                'web_path' => $this->storage->webPath($filename),
             ];
         }
         return $data;
