@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -53,7 +54,7 @@ class Sheet
     private array $files = [];
 
     /**
-     * @var array<\Symfony\Component\HttpFoundation\File\UploadedFile>
+     * @var array<UploadedFile>
      */
     #[Assert\All([
         new Assert\File(
@@ -240,7 +241,7 @@ class Sheet
     }
 
     /**
-     * @return array<\Symfony\Component\HttpFoundation\File\UploadedFile>
+     * @return array<UploadedFile>
      */
     public function getUploadedFiles(): array
     {
@@ -248,7 +249,7 @@ class Sheet
     }
 
     /**
-     * @param array<\Symfony\Component\HttpFoundation\File\UploadedFile> $files
+     * @param array<UploadedFile> $files
      */
     public function setUploadedFiles(array $files): static
     {
