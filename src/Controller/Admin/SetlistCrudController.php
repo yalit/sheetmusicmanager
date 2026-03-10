@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Admin\Action\DuplicateSetlistAction;
+use App\Admin\Action\GenerateSetlistPdfAction;
 use App\Admin\Fields\CollectionTableField;
 use App\Entity\Setlist;
 use App\Security\Voter\SetlistVoter;
@@ -42,6 +43,8 @@ class SetlistCrudController extends AbstractCrudController
     {
         return $actions
             ->add(Crud::PAGE_INDEX, DuplicateSetlistAction::new())
+            ->add(Crud::PAGE_INDEX, GenerateSetlistPdfAction::new())
+            ->add(Crud::PAGE_DETAIL, GenerateSetlistPdfAction::new())
             ->setPermission(Action::INDEX,  SetlistVoter::INDEX)
             ->setPermission(Action::DETAIL, SetlistVoter::DETAIL)
             ->setPermission(Action::NEW,    SetlistVoter::NEW)
