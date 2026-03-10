@@ -18,11 +18,13 @@ tasks:
         desc: Bring the server up
         cmds:
             - "{{.SYMFONY}} serve -d"
+            - "docker compose up -d"
 
     down:
         desc: Bring the server down
         cmds:
             - "{{.SYMFONY}} server:stop"
+            - "docker compose down"
 
     # DB
     migrations:
