@@ -1,0 +1,4 @@
+services:
+    Sensiolabs\GotenbergBundle\GotenbergPdfInterface:
+        class: App\Tests\Doubles\FakeGotenbergPdf
+        public: true
