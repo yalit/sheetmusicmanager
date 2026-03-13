@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Sheet;
+use App\Entity\ValueObject\StoredFile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -23,7 +24,7 @@ class SheetFixtures extends Fixture
                 ->setTitle($title)
                 ->setRefs($refs)
                 ->setTags($tags)
-                ->setFiles(['test.pdf'])
+                ->setFiles([StoredFile::fromArray(['name' => $ref, 'filename' => $ref])])
             ;
 
             $manager->persist($sheet);
