@@ -1,7 +1,7 @@
 # Epic 8: Custom Actions (LIVE CODING)
 
 **Branch**: `epic/08-actions`
-**Status**: ⏳ Pending
+**Status**: ✅ Done (pending tag + live coding rehearsal)
 **Dependencies**: Epic 3 (Basic Admin)
 
 **Git Tag After Completion**: `step-3-custom-actions` 🔴 **LIVE CODING SAFETY NET**
@@ -18,371 +18,127 @@ Implement custom EasyAdmin actions working with the actual entities:
 
 No status field, no organisation/multi-tenancy, no VichUploader.
 
-The epic covers three actions:
+The epic covers four actions:
 - **"Duplicate Setlist"** — pre-built, single-entity action
-- **"Generate Setlist PDF"** — pre-built, using [GotenbergBundle](https://github.com/sensiolabs/GotenbergBundle)
-- **"Add to Setlist"** — live-coded, batch action
+- **"Generate Setlist PDF"** — pre-built, Chromium-rendered programme PDF via GotenbergBundle
+- **"Merge Setlist Sheets PDF"** — pre-built, merges uploaded sheet files into one PDF via GotenbergBundle
+- **"Add to Setlist"** — live-coded, batch action with intermediate form
+
+All four follow the custom action pattern documented in `docs/patterns/actions.md`:
+dedicated `XxxAction.php` (EA config) + `XxxController.php` (HTTP) + handler (business logic),
+wired with `linkToRoute()` — no business logic inside CRUD controllers.
 
 ---
 
 ## Stories
 
-### Story 8.1: Implement "Duplicate Setlist" Action (Pre-built) ⏳
+### Story 8.1: Implement "Duplicate Setlist" Action ✅
 
 **Description**: Single-entity action on a Setlist that clones it with all its items.
-Demonstrates `linkToCrudAction()`, redirect to edit, and cloning a OneToMany relationship.
 
-**In `SetlistCrudController`**:
+**Pattern**: Simple action (no user input).
 
-```php
-// configureActions()
-$duplicate = Action::new('duplicate', 'Duplicate')
-    ->linkToCrudAction('duplicate')
-    ->setIcon('fa fa-copy')
-    ->addCssClass('btn btn-secondary')
-    ->renderAsLink();
+**Implementation**:
+- `src/Admin/Action/DuplicateSetlistAction.php` — EA config, `linkToRoute('admin_duplicate_setlist')`
+- `src/Admin/Action/DuplicateSetlist.php` — DTO carrying the source `Setlist`
+- `src/Admin/Action/DuplicateSetlistHandler.php` — clones via `SetlistFactory::clone()`, saves via repository
+- `src/Controller/Action/DuplicateSetlistController.php` — resolves entity via ParamConverter, calls handler, redirects to edit
+- `src/Entity/Factory/SetlistFactory.php` + `SetlistItemFactory.php` — entity construction and cloning
 
-return $actions
-    ->add(Crud::PAGE_INDEX, $duplicate)
-    ->add(Crud::PAGE_DETAIL, $duplicate);
+**Behaviour**:
+- Cloned setlist copies title, notes, and all items with their positions
+- Date is reset to today
+- Redirects to the edit page of the new setlist with a success flash
 
-// action method
-public function duplicate(AdminContext $context, EntityManagerInterface $em): Response
-{
-    /** @var Setlist $original */
-    $original = $context->getEntity()->getInstance();
-
-    $copy = new Setlist();
-    $copy->setTitle($original->getTitle() . ' (copie)');
-    $copy->setDate(null);
-    $copy->setNotes($original->getNotes());
-    $em->persist($copy);
-
-    foreach ($original->getItem() as $item) {
-        $newItem = new SetListItem();
-        $newItem->setSetlist($copy);
-        $newItem->setSheet($item->getSheet());
-        $newItem->setPosition($item->getPosition());
-        $newItem->setName($item->getName() ?? '');
-        $newItem->setNotes($item->getNotes() ?? '');
-        $em->persist($newItem);
-    }
-
-    $em->flush();
-
-    $this->addFlash('success', sprintf('Setlist "%s" dupliquée.', $original->getTitle()));
-
-    return $this->redirect(
-        $this->container->get(AdminUrlGenerator::class)
-            ->setController(SetlistCrudController::class)
-            ->setAction(Action::EDIT)
-            ->setEntityId($copy->getId())
-            ->generateUrl()
-    );
-}
-```
-
-**Acceptance Criteria**:
-- Action visible on index and detail pages
-- Cloned setlist has all items with correct positions
-- Date cleared, title gets " (copie)" suffix
-- Redirects to edit page of the new setlist
-
-**Deliverables**:
-- Updated `SetlistCrudController`
+**Registered in**: `SetlistCrudController::configureActions()` on `PAGE_INDEX` and `PAGE_DETAIL`
 
 ---
 
-### Story 8.2: Implement "Generate Setlist PDF" Action (Pre-built) ⏳
+### Story 8.2: Implement "Generate Setlist PDF" Action ✅
 
-**Description**: Single-entity action on a Setlist that generates a PDF of its programme
-using [GotenbergBundle](https://github.com/sensiolabs/GotenbergBundle) — a Symfony-native
-integration for the Gotenberg headless-Chrome PDF API.
+**Description**: Single-entity action that generates a Chromium-rendered programme PDF
+for a Setlist via GotenbergBundle.
 
-#### Setup
+**Pattern**: Simple action (no user input).
 
-**Install**:
-```bash
-composer require sensiolabs/gotenberg-bundle
-```
+**Implementation**:
+- `src/Admin/Action/GenerateSetlistPdfAction.php` — EA config, `linkToRoute('admin_generate_setlist_pdf')`
+- `src/Controller/Action/GenerateSetlistPdfController.php` — streams the PDF response via `GotenbergPdfInterface::html()`
+- `templates/admin/pdf/setlist.html.twig` — standalone HTML document (no Symfony base template), rendered by Gotenberg's headless Chrome
 
-Gotenberg itself runs as a sidecar service. Add to `compose.yaml`:
-```yaml
-gotenberg:
-    image: gotenberg/gotenberg:8
-    ports:
-        - "3000:3000"
-```
+**Behaviour**:
+- Downloads `setlist-{id}.pdf`
+- PDF lists all setlist items in order (position, sheet title, item name)
+- No crash on empty setlist (renders an empty table)
 
-**`config/packages/sensiolabs_gotenberg.yaml`**:
-```yaml
-sensiolabs_gotenberg:
-    http_client: 'gotenberg.client'
-    default_options:
-        pdf:
-            html:
-                paper_standard_size: 'A4'
-                margin_top: 1.5
-                margin_bottom: 1.5
-                margin_left: 1.5
-                margin_right: 1.5
-```
-
-**`config/packages/framework.yaml`** (add scoped client):
-```yaml
-framework:
-    http_client:
-        scoped_clients:
-            gotenberg.client:
-                base_uri: '%env(GOTENBERG_DSN)%'
-```
-
-Add to `.env`:
-```
-GOTENBERG_DSN=http://localhost:3000
-```
-
-#### Action
-
-**In `SetlistCrudController`** — inject `GotenbergPdfInterface` in the constructor, then:
-
-```php
-use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
-
-// configureActions()
-$generatePdf = Action::new('generatePdf', 'Export PDF')
-    ->linkToCrudAction('generatePdf')
-    ->setIcon('fa fa-file-pdf')
-    ->addCssClass('btn btn-secondary')
-    ->renderAsLink();
-
-return $actions
-    ->add(Crud::PAGE_INDEX, $generatePdf)
-    ->add(Crud::PAGE_DETAIL, $generatePdf);
-
-// action method
-public function generatePdf(AdminContext $context): Response
-{
-    /** @var Setlist $setlist */
-    $setlist = $context->getEntity()->getInstance();
-
-    return $this->gotenberg->html()
-        ->content('admin/pdf/setlist.html.twig', ['setlist' => $setlist])
-        ->fileName(sprintf('setlist-%s', $setlist->getId()))
-        ->generate()
-        ->stream();
-}
-```
-
-#### PDF Template
-
-**`templates/admin/pdf/setlist.html.twig`** — must be a full HTML document:
-```twig
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>{{ setlist.title }}</title>
-    <style>
-        body { font-family: sans-serif; font-size: 14px; }
-        h1 { font-size: 22px; margin-bottom: 4px; }
-        .meta { color: #666; margin-bottom: 24px; }
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 6px 8px; border-bottom: 1px solid #ddd; vertical-align: top; }
-        .pos { width: 32px; color: #999; }
-    </style>
-</head>
-<body>
-    <h1>{{ setlist.title }}</h1>
-    <p class="meta">
-        {% if setlist.date %}{{ setlist.date|date('d/m/Y') }}{% endif %}
-    </p>
-    <table>
-        {% for item in setlist.item %}
-        <tr>
-            <td class="pos">{{ loop.index }}</td>
-            <td>{{ item.sheet.title }}</td>
-            <td>{{ item.name }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
-```
-
-**Acceptance Criteria**:
-- Gotenberg service running via Docker
-- Action visible on index and detail pages
-- Clicking it downloads a PDF named `setlist-{id}.pdf`
-- PDF lists all setlist items in order
-- No crash when setlist has no items
-
-**Deliverables**:
-- `compose.yaml` updated with Gotenberg service
-- `config/packages/sensiolabs_gotenberg.yaml`
-- `templates/admin/pdf/setlist.html.twig`
-- Updated `SetlistCrudController`
+**Registered in**: `SetlistCrudController::configureActions()` on `PAGE_INDEX` and `PAGE_DETAIL`
 
 ---
 
-### Story 8.3: Prepare Template for "Add to Setlist" Batch Action (Live Coding) ⏳
+### Story 8.3: Implement "Merge Setlist Sheets PDF" Action ✅
 
-**Description**: Skeleton file and intermediate Twig template for the live-coded batch action.
+**Description**: Single-entity action that merges all uploaded sheet PDF files in a Setlist
+into a single downloadable PDF via GotenbergBundle's merge API.
 
-The flow is two-step because `BatchActionDto` (carrying the selected IDs) is only available
-on the first request. The IDs must be forwarded as a hidden field on the intermediate form.
+**Pattern**: Simple action (no user input).
 
-**Template** (`src/Action/AddToSetlistAction.TEMPLATE.php`):
-```php
-<?php
+**Implementation**:
+- `src/Admin/Action/MergeSetlistSheetsPdfAction.php` — EA config, `linkToRoute('admin_merge_setlist_sheets_pdf')`
+- `src/Controller/Action/MergeSetlistSheetsPdfController.php` — collects file paths via `SheetFileStorage`, calls `GotenbergPdfInterface::merge()`, streams result
+- `src/Storage/SheetFileStorage.php` — centralises all file path resolution (extracted in a prior refactor)
 
-// TEMPLATE for Live Coding — implement in SheetCrudController
+**Behaviour**:
+- Iterates items in setlist order; for each item collects all sheet files
+- Skips files that are missing on disk (silently)
+- If no files are found at all: adds a warning flash and redirects back to the edit page
+- Otherwise downloads `partitions-{id}.pdf`
 
-/**
- * Steps:
- * 1. In configureActions(): declare the batch action with Action::new()->linkToCrudAction()
- *    and register it with ->addBatchAction()
- *
- * 2. Action method signature:
- *    public function addToSetlist(BatchActionDto $batchActionDto, Request $request, ...): Response
- *
- * 3. If $request->isMethod('POST'): process — load Setlist, create SetListItems, flush, redirect
- *    Otherwise: render the selection page (setlist dropdown + hidden entity IDs)
- *
- * 4. Position: MAX(position) of existing items + 1 for each new item
- *
- * 5. Template: templates/admin/action/add_to_setlist.html.twig
- */
-```
-
-**Intermediate template** (`templates/admin/action/add_to_setlist.html.twig`):
-```twig
-{% extends '@EasyAdmin/layout.html.twig' %}
-{% block content %}
-<div class="container py-4" style="max-width: 480px">
-    <h2>Ajouter à une setlist</h2>
-    <p>{{ sheet_count }} fiche(s) sélectionnée(s).</p>
-    <form method="POST">
-        <div class="mb-3">
-            <label for="setlist_id" class="form-label">Setlist</label>
-            <select name="setlist_id" id="setlist_id" class="form-select" required>
-                <option value="">-- Choisir --</option>
-                {% for setlist in setlists %}
-                    <option value="{{ setlist.id }}">{{ setlist.title }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <input type="hidden" name="entity_ids" value="{{ entity_ids|join(',') }}">
-        <div class="d-flex gap-2">
-            <a href="{{ referrer_url }}" class="btn btn-secondary">Annuler</a>
-            <button type="submit" class="btn btn-primary">Ajouter</button>
-        </div>
-    </form>
-</div>
-{% endblock %}
-```
-
-**Acceptance Criteria**:
-- Files in place with clear comments
-- App still runs normally (template file not autoloaded)
-
-**Deliverables**:
-- `src/Action/AddToSetlistAction.TEMPLATE.php`
-- `templates/admin/action/add_to_setlist.html.twig`
+**Registered in**: `SetlistCrudController::configureActions()` on `PAGE_INDEX` and `PAGE_DETAIL`
 
 ---
 
-### Story 8.4: Implement "Add to Setlist" Batch Action — Complete Version (Safety Net) ⏳
+### Story 8.4: Implement "Add to Setlist" Batch Action ✅
 
-**Description**: Full working implementation in `SheetCrudController`.
+**Description**: Batch action on the Sheet index. Lets the user select sheets, then pick
+a target Setlist via an intermediate form before confirming.
 
-```php
-// configureActions()
-$addToSetlist = Action::new('addToSetlist', 'Ajouter à une setlist')
-    ->linkToCrudAction('addToSetlist')
-    ->addCssClass('btn btn-primary');
+**Pattern**: Form + Symfony Messenger variant (needs user input before executing).
 
-return $actions
-    ->addBatchAction($addToSetlist)
-    // ... existing permissions ...
-    ;
+**Implementation**:
+- `src/Admin/Action/AddSheetsToSetlistAction.php` — EA config, `linkToRoute('admin_add_to_setlist')`
+- `src/Message/AddSheetsToSetlist.php` — Messenger Message DTO (`#[AsMessage]`), public `$setlist` + `$sheets[]` with Validator constraints
+- `src/Message/Factory/AddSheetsToSetListFactory.php` — hydrates Message from raw `batchActionEntityIds[]`, resolves entities via `SheetRepository`
+- `src/Form/AddSheetsToSetlistType.php` — `AbstractType` with `data_class = AddSheetsToSetlist`; setlist picker via `EntityType`, sheets via `HiddenType` + transformer
+- `src/Form/DataTransformer/SheetToStringDataTransformer.php` — bridges `Sheet[]` ↔ JSON string for the hidden field
+- `src/MessageHandler/AddSheetsToSetlistHandler.php` — `#[AsMessageHandler]`, appends items with sequential positions after existing ones
+- `src/Controller/Action/AddToSetlistController.php` — two-POST flow: factory → form → `handleRequest`; on valid submit dispatches message and redirects to setlist edit
+- `templates/admin/action/add_to_setlist.html.twig` — intermediate form rendered between the two POSTs
 
-// action method
-public function addToSetlist(
-    BatchActionDto $batchActionDto,
-    Request $request,
-    EntityManagerInterface $em,
-    SetlistRepository $setlistRepository,
-): Response {
-    if ($request->isMethod('POST')) {
-        $setlist = $em->find(Setlist::class, $request->request->get('setlist_id'));
-        if (!$setlist) {
-            $this->addFlash('danger', 'Setlist introuvable.');
-            return $this->redirect($batchActionDto->getReferrerUrl());
-        }
+**Two-POST flow**:
+1. EA batch action fires a POST with `batchActionEntityIds[]` → factory hydrates Message → form rendered with pre-populated hidden field
+2. User picks a setlist and submits → `isSubmitted() && isValid()` → message dispatched → redirect to setlist edit
 
-        $maxPosition = (int) $em->createQuery(
-            'SELECT COALESCE(MAX(i.position), 0) FROM App\Entity\SetListItem i WHERE i.setlist = :s'
-        )->setParameter('s', $setlist)->getSingleScalarResult();
-
-        $ids = array_filter(explode(',', $request->request->get('entity_ids', '')));
-        $added = 0;
-        foreach ($ids as $id) {
-            $sheet = $em->find(Sheet::class, (int) $id);
-            if (!$sheet) continue;
-            $item = new SetListItem();
-            $item->setSetlist($setlist);
-            $item->setSheet($sheet);
-            $item->setPosition(++$maxPosition);
-            $item->setName('');
-            $item->setNotes('');
-            $em->persist($item);
-            $added++;
-        }
-        $em->flush();
-
-        $this->addFlash('success', sprintf('%d fiche(s) ajoutée(s) à "%s".', $added, $setlist->getTitle()));
-        return $this->redirect($batchActionDto->getReferrerUrl());
-    }
-
-    return $this->render('admin/action/add_to_setlist.html.twig', [
-        'setlists'     => $setlistRepository->findBy([], ['title' => 'ASC']),
-        'sheet_count'  => count($batchActionDto->getEntityIds()),
-        'entity_ids'   => $batchActionDto->getEntityIds(),
-        'referrer_url' => $batchActionDto->getReferrerUrl(),
-    ]);
-}
-```
-
-**Acceptance Criteria**:
-- Batch action button appears on Sheet index
-- Intermediate page shows the setlist dropdown
-- Items created with sequential positions after existing ones
-- Flash message confirms how many sheets were added
-- All existing tests still pass
-
-**Deliverables**:
-- Updated `SheetCrudController`
+**Registered in**: `SheetCrudController::configureActions()` as a batch action on `PAGE_INDEX`
 
 ---
 
-### Story 8.5: Document Custom Action Pattern ⏳
+### Story 8.5: Document Custom Action Pattern ✅
 
 **Deliverables**:
-- `docs/patterns/actions.md`
+- `docs/patterns/actions.md` — full pattern documentation for both variants (simple and form + Messenger)
 
 ---
 
 ## Epic Acceptance Criteria
 
-- [ ] "Duplicate Setlist" action working on index and detail
-- [ ] "Generate Setlist PDF" action working end-to-end (requires Gotenberg Docker service)
-- [ ] "Add to Setlist" template and Twig skeleton in place
-- [ ] "Add to Setlist" complete version working end-to-end
-- [ ] Action pattern documented
-- [ ] Live coding rehearsed 5+ times, under 4 minutes
+- [x] "Duplicate Setlist" action working on index and detail
+- [x] "Generate Setlist PDF" action working end-to-end (requires Gotenberg Docker service)
+- [x] "Merge Setlist Sheets PDF" action working end-to-end (requires Gotenberg Docker service)
+- [x] "Add to Setlist" batch action working end-to-end with intermediate form
+- [x] Custom action pattern documented (`docs/patterns/actions.md`)
 - [ ] Safety net branch tagged as `step-3-custom-actions`
 - [ ] All existing tests still pass
+- [ ] Live coding rehearsed 5+ times, under 4 minutes
 
 ---
 
