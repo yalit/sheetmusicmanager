@@ -1,6 +1,6 @@
 {% macro file_row() %}
     <li class="loaded_file">
-        <span data-file-remove="__FILENAME__" class="loaded_file__remove">&times;</span>
+        <span data-new-filename="__FILENAME__" class="loaded_file__remove">&times;</span>
         <span class="loaded_file__name">__FILENAME__</span>
         <span class="loaded_file__size">(__FILESIZE__)</span>
     </li>
@@ -15,9 +15,9 @@
             <ul class="loaded_files_existing">
                 {% for file in existing_files %}
                     <li class="loaded_file">
-                        <span data-existing-remove="{{ file.name }}" class="loaded_file__remove">&times;</span>
-                        <a href="{{ file.web_path }}" target="_blank" class="loaded_file__name loaded_file__link">{{ file.name }}</a>
-                        <span class="loaded_file__size">({{ file.size }})</span>
+                        <span data-file="{{ file | json_encode}}" class="loaded_file__remove">&times;</span>
+                        <a href="{{ webpath(file) }}" target="_blank" class="loaded_file__name loaded_file__link">{{ file.name }}</a>
+                        <span class="loaded_file__size">({{ filesize(file) }})</span>
                     </li>
                 {% endfor %}
             </ul>
@@ -26,9 +26,9 @@
         <ul class="loaded_files" style="display: none">
         </ul>
         <input type="hidden" id="app_pdf_field_kept" name="app_pdf_field_kept"
-               value="{{ existing_files|map(f => f.name)|json_encode|e('html_attr') }}">
+               value="{{ existing_files | json_encode }}">
         <input type="hidden" id="app_pdf_field_removed" name="app_pdf_field_removed"
-               value="{{ []|json_encode|e('html_attr') }}">
+               value="{{ [] | json_encode }}">
     </div>
     <template id="pdf_field_file">
         {{ _self.file_row() }}

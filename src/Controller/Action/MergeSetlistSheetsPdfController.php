@@ -4,7 +4,7 @@ namespace App\Controller\Action;
 
 use App\Entity\Setlist;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
-use App\Storage\SheetFileStorage;
+use App\Storage\StoredFileStorage;
 use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -15,7 +15,7 @@ final class MergeSetlistSheetsPdfController extends AbstractController
 {
     public function __construct(
         private readonly GotenbergPdfInterface $gotenberg,
-        private readonly SheetFileStorage      $storage,
+        private readonly StoredFileStorage     $storage,
     ) {}
 
     #[AdminRoute('/setlist/{id}/merge-sheets-pdf', name: 'merge_setlist_sheets_pdf')]
@@ -24,8 +24,8 @@ final class MergeSetlistSheetsPdfController extends AbstractController
         $paths = [];
 
         foreach ($setlist->getItems() as $item) {
-            foreach ($item->getSheet()->getFiles() as $filename) {
-                $path = $this->storage->absolutePath($filename);
+            foreach ($item->getSheet()?->getFiles() as $storedFile) {
+                $path = $this->storage->absolutePath($storedFile);
                 if (is_file($path)) {
                     $paths[] = $path;
                 }

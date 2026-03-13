@@ -15,15 +15,17 @@ class PdfFieldInput {
             this.renderFileList()
         })
 
-        this.existingFileHolder?.querySelectorAll('[data-existing-remove]').forEach(el => {
+        this.existingFileHolder?.querySelectorAll('[data-file]').forEach(el => {
             el.addEventListener('click', () => {
                 el.closest('.loaded_file').remove()
                 let kept = JSON.parse(this.keptInput.value)
-                kept = kept.filter(name => name !== el.dataset.existingRemove)
+                let file = JSON.parse(el.dataset.file)
+
+                kept = kept.filter(({filename}) => filename !== file.filename)
                 this.keptInput.value = JSON.stringify(kept)
 
                 let removed = JSON.parse(this.removedInput.value)
-                removed.push(el.dataset.existingRemove)
+                removed.push(file)
                 this.removedInput.value = JSON.stringify(removed)
                 this.updateEmptyMessage()
             })
@@ -65,9 +67,11 @@ class PdfFieldInput {
             this.loadedFileHolder.appendChild(clone)
         })
 
-        this.loadedFileHolder.querySelectorAll('[data-file-remove]').forEach(el => {
+        this.loadedFileHolder.querySelectorAll('[data-new-filename]').forEach(el => {
             el.addEventListener('click', () => {
-                this.managedFiles = this.managedFiles.filter(f => f.name !== el.dataset.fileRemove)
+                let filename = el.dataset.newFilename
+
+                this.managedFiles = this.managedFiles.filter(f => f.name !== filename)
                 this.syncInputFiles()
                 this.renderFileList()
             })

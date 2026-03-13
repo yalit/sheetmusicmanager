@@ -7,10 +7,11 @@ use App\Admin\Fields\ChoiceAutoCompleteStringField;
 use App\Admin\Fields\CollectionTableField;
 use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
+use App\Entity\ValueObject\StoredFile;
 use App\Filter\HasPdfFilter;
 use App\Repository\SheetRepository;
 use App\Security\Voter\SheetVoter;
-use App\Storage\SheetFileStorage;
+use App\Storage\StoredFileStorage;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -30,9 +31,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class SheetCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly SheetRepository  $sheetRepository,
-        private readonly RequestStack     $requestStack,
-        private readonly SheetFileStorage $storage,
+        private readonly SheetRepository   $sheetRepository,
+        private readonly RequestStack      $requestStack,
+        private readonly StoredFileStorage $storage,
     ) {
     }
 
@@ -81,7 +82,7 @@ class SheetCrudController extends AbstractCrudController
         yield PDFField::new('files', 'Fichier PDF')->hideOnForm();
         yield PDFField::new('uploadedFiles', 'Fichier PDF')
             ->onlyOnForms()
-            ->setExistingFiles($this->buildExistingFilesData())
+            ->setExistingFiles($this->getExistingFilesData())
             ->setRequired(false);
 
         yield FormField::addColumn(4);
@@ -117,18 +118,33 @@ class SheetCrudController extends AbstractCrudController
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        $removed = json_decode($request?->request->get('app_pdf_field_removed', '[]') ?: '[]', true);
-        foreach ($removed as $filename) {
-            $this->storage->delete($filename);
+        if (!$request) {
+            return;
+        }
+        $removedData = $request->request->get('app_pdf_field_removed', '[]') ?: '[]';
+
+        if (!is_string($removedData)) { return; }
+        /** @var array<array<string,string>> $removed */
+        $removed = json_decode($removedData, true);
+        foreach ($removed as $data) {
+            $this->storage->delete(StoredFile::fromArray($data));
         }
 
-        $kept = json_decode($request?->request->get('app_pdf_field_kept', '[]') ?: '[]', true);
+        $keptData = $request->request->get('app_pdf_field_kept', '[]') ?: '[]';
+        if (!is_string($keptData)) {return;}
+
+        /** @var array<array<string,string>> $kept */
+        $kept = json_decode($keptData, true);
+
         $newFilenames = $this->moveUploadedFiles($entityInstance);
-        $entityInstance->setFiles(array_merge($kept, $newFilenames));
+        $entityInstance->setFiles(array_merge(array_map(fn($arr) => StoredFile::fromArray($arr), $kept), $newFilenames));
 
         parent::updateEntity($entityManager, $entityInstance);
     }
 
+    /**
+     * @return StoredFile[]
+     */
     private function moveUploadedFiles(Sheet $entityInstance): array
     {
         $filenames = [];
@@ -139,34 +155,16 @@ class SheetCrudController extends AbstractCrudController
         return $filenames;
     }
 
-    private function buildExistingFilesData(): array
+    /**
+     * @return StoredFile[]
+     */
+    private function getExistingFilesData(): array
     {
         $entity = $this->getContext()?->getEntity()?->getInstance();
         if (!$entity instanceof Sheet) {
             return [];
         }
 
-        $data = [];
-        foreach ($entity->getFiles() as $filename) {
-            $fullPath = $this->storage->absolutePath($filename);
-            $size = is_file($fullPath) ? filesize($fullPath) : 0;
-            $data[] = [
-                'name' => $filename,
-                'size' => $this->formatFileSize($size),
-                'web_path' => $this->storage->webPath($filename),
-            ];
-        }
-        return $data;
-    }
-
-    private function formatFileSize(int|false $bytes): string
-    {
-        if ($bytes === false || $bytes < 1024) {
-            return ($bytes ?: 0) . ' o';
-        }
-        if ($bytes < 1024 * 1024) {
-            return round($bytes / 1024, 1) . ' Ko';
-        }
-        return round($bytes / (1024 * 1024), 1) . ' Mo';
+        return $entity->getFiles();
     }
 }

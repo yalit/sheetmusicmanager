@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Doctrine\ValueObjectArray;
+use App\Entity\ValueObject\StoredFile;
 use App\Repository\SheetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -48,9 +50,9 @@ class Sheet
     private array $refs = [];
 
     /**
-     * @var string[]
+     * @var StoredFile[]
      */
-    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    #[ORM\Column(type: ValueObjectArray::VALUE_OBJECT_ARRAY, options: ['class' => StoredFile::class])]
     private array $files = [];
 
     /**
@@ -153,7 +155,7 @@ class Sheet
     }
 
     /**
-     * @return string[]
+     * @return StoredFile[]
      */
     public function getFiles(): array
     {
@@ -161,7 +163,7 @@ class Sheet
     }
 
     /**
-     * @param string[]|null $files
+     * @param StoredFile[]|null $files
      * @return $this
      */
     public function setFiles(?array $files): static

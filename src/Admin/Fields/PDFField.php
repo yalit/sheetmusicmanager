@@ -3,6 +3,7 @@
 namespace App\Admin\Fields;
 
 use App\Admin\Type\SheetFileType;
+use App\Entity\ValueObject\StoredFile;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
 
@@ -31,7 +32,7 @@ class PDFField implements FieldInterface
     }
 
     /**
-     * @param array<array{name: string, size: string, web_path: string}> $data
+     * @param StoredFile[] $data
      */
     public function setExistingFiles(array $data): self
     {
