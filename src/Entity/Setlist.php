@@ -42,11 +42,11 @@ class Setlist
      */
     #[ORM\OneToMany(targetEntity: SetListItem::class, mappedBy: 'setlist', cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
-    private Collection $item;
+    private Collection $items;
 
     public function __construct()
     {
-        $this->item = new ArrayCollection();
+        $this->items = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -93,15 +93,15 @@ class Setlist
     /**
      * @return Collection<int, SetListItem>
      */
-    public function getItem(): Collection
+    public function getItems(): Collection
     {
-        return $this->item;
+        return $this->items;
     }
 
     public function addItem(SetListItem $item): static
     {
-        if (!$this->item->contains($item)) {
-            $this->item->add($item);
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
             $item->setSetlist($this);
         }
 
@@ -110,7 +110,7 @@ class Setlist
 
     public function removeItem(SetListItem $item): static
     {
-        if ($this->item->removeElement($item)) {
+        if ($this->items->removeElement($item)) {
             // set the owning side to null (unless already changed)
             if ($item->getSetlist() === $this) {
                 $item->setSetlist(null);

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Doctrine\ValueObjectArray;
+use App\Entity\ValueObject\StoredFile;
 use App\Repository\SheetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -47,13 +50,13 @@ class Sheet
     private array $refs = [];
 
     /**
-     * @var string[]
+     * @var StoredFile[]
      */
-    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    #[ORM\Column(type: ValueObjectArray::VALUE_OBJECT_ARRAY, options: ['class' => StoredFile::class])]
     private array $files = [];
 
     /**
-     * @var array<\Symfony\Component\HttpFoundation\File\UploadedFile>
+     * @var array<UploadedFile>
      */
     #[Assert\All([
         new Assert\File(
@@ -152,7 +155,7 @@ class Sheet
     }
 
     /**
-     * @return string[]
+     * @return StoredFile[]
      */
     public function getFiles(): array
     {
@@ -160,7 +163,7 @@ class Sheet
     }
 
     /**
-     * @param string[]|null $files
+     * @param StoredFile[]|null $files
      * @return $this
      */
     public function setFiles(?array $files): static
@@ -240,7 +243,7 @@ class Sheet
     }
 
     /**
-     * @return array<\Symfony\Component\HttpFoundation\File\UploadedFile>
+     * @return array<UploadedFile>
      */
     public function getUploadedFiles(): array
     {
@@ -248,7 +251,7 @@ class Sheet
     }
 
     /**
-     * @param array<\Symfony\Component\HttpFoundation\File\UploadedFile> $files
+     * @param array<UploadedFile> $files
      */
     public function setUploadedFiles(array $files): static
     {

@@ -2,13 +2,16 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Action\AddSheetsToSetlistAction;
 use App\Admin\Fields\ChoiceAutoCompleteStringField;
 use App\Admin\Fields\CollectionTableField;
 use App\Admin\Fields\PDFField;
 use App\Entity\Sheet;
-use App\Filter\TagFilter;
+use App\Entity\ValueObject\StoredFile;
+use App\Filter\HasPdfFilter;
 use App\Repository\SheetRepository;
 use App\Security\Voter\SheetVoter;
+use App\Storage\StoredFileStorage;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -19,9 +22,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use App\Filter\HasPdfFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -30,13 +31,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class SheetCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly SheetRepository $sheetRepository,
-        private readonly RequestStack    $requestStack,
-        private readonly Filesystem      $filesystem,
-        private readonly string          $projectDir,
-        private readonly string          $uploadDir,
-    )
-    {
+        private readonly SheetRepository   $sheetRepository,
+        private readonly RequestStack      $requestStack,
+        private readonly StoredFileStorage $storage,
+    ) {
     }
 
     public static function getEntityFqcn(): string
@@ -55,7 +53,9 @@ class SheetCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+
         return $actions
+            ->addBatchAction(AddSheetsToSetlistAction::new())
             ->setPermission(Action::INDEX,  SheetVoter::INDEX)
             ->setPermission(Action::DETAIL, SheetVoter::DETAIL)
             ->setPermission(Action::NEW,    SheetVoter::NEW)
@@ -66,11 +66,6 @@ class SheetCrudController extends AbstractCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
-        $getTagChoices = function () {
-            $tags = $this->sheetRepository->getAllTags();
-            usort($tags, fn($a, $b) => strcmp($a, $b));
-            return array_combine($tags, $tags);
-        };
         return $filters
             ->add(TextFilter::new('title'))
             ->add(HasPdfFilter::new('files', 'Has PDF'))
@@ -87,7 +82,7 @@ class SheetCrudController extends AbstractCrudController
         yield PDFField::new('files', 'Fichier PDF')->hideOnForm();
         yield PDFField::new('uploadedFiles', 'Fichier PDF')
             ->onlyOnForms()
-            ->setExistingFiles($this->buildExistingFilesData())
+            ->setExistingFiles($this->getExistingFilesData())
             ->setRequired(false);
 
         yield FormField::addColumn(4);
@@ -123,61 +118,53 @@ class SheetCrudController extends AbstractCrudController
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        $removed = json_decode($request?->request->get('app_pdf_field_removed', '[]') ?: '[]', true);
-        foreach ($removed as $filename) {
-            $this->filesystem->remove(
-                $this->projectDir . DIRECTORY_SEPARATOR . $this->uploadDir . DIRECTORY_SEPARATOR . $filename
-            );
+        if (!$request) {
+            return;
+        }
+        $removedData = $request->request->get('app_pdf_field_removed', '[]') ?: '[]';
+
+        if (!is_string($removedData)) { return; }
+        /** @var array<array<string,string>> $removed */
+        $removed = json_decode($removedData, true);
+        foreach ($removed as $data) {
+            $this->storage->delete(StoredFile::fromArray($data));
         }
 
-        $kept = json_decode($request?->request->get('app_pdf_field_kept', '[]') ?: '[]', true);
+        $keptData = $request->request->get('app_pdf_field_kept', '[]') ?: '[]';
+        if (!is_string($keptData)) {return;}
+
+        /** @var array<array<string,string>> $kept */
+        $kept = json_decode($keptData, true);
+
         $newFilenames = $this->moveUploadedFiles($entityInstance);
-        $entityInstance->setFiles(array_merge($kept, $newFilenames));
+        $entityInstance->setFiles(array_merge(array_map(fn($arr) => StoredFile::fromArray($arr), $kept), $newFilenames));
 
         parent::updateEntity($entityManager, $entityInstance);
     }
 
+    /**
+     * @return StoredFile[]
+     */
     private function moveUploadedFiles(Sheet $entityInstance): array
     {
         $filenames = [];
         foreach ($entityInstance->getUploadedFiles() as $file) {
-            $filename = $file->getClientOriginalName();
-            $file->move($this->projectDir . DIRECTORY_SEPARATOR . $this->uploadDir, $filename);
-            $filenames[] = $filename;
+            $filenames[] = $this->storage->save($file);
         }
         $entityInstance->setUploadedFiles([]);
         return $filenames;
     }
 
-    private function buildExistingFilesData(): array
+    /**
+     * @return StoredFile[]
+     */
+    private function getExistingFilesData(): array
     {
         $entity = $this->getContext()?->getEntity()?->getInstance();
         if (!$entity instanceof Sheet) {
             return [];
         }
 
-        $webPrefix = '/' . preg_replace('#^public/#', '', $this->uploadDir);
-        $data = [];
-        foreach ($entity->getFiles() as $filename) {
-            $fullPath = $this->projectDir . DIRECTORY_SEPARATOR . $this->uploadDir . DIRECTORY_SEPARATOR . $filename;
-            $size = is_file($fullPath) ? filesize($fullPath) : 0;
-            $data[] = [
-                'name' => $filename,
-                'size' => $this->formatFileSize($size),
-                'web_path' => $webPrefix . '/' . $filename,
-            ];
-        }
-        return $data;
-    }
-
-    private function formatFileSize(int|false $bytes): string
-    {
-        if ($bytes === false || $bytes < 1024) {
-            return ($bytes ?: 0) . ' o';
-        }
-        if ($bytes < 1024 * 1024) {
-            return round($bytes / 1024, 1) . ' Ko';
-        }
-        return round($bytes / (1024 * 1024), 1) . ' Mo';
+        return $entity->getFiles();
     }
 }

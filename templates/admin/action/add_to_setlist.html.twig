@@ -1,0 +1,15 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 480px">
+    <h2>Ajouter à une setlist</h2>
+    <p>{{ sheet_count }} fiche(s) sélectionnée(s).</p>
+    {{ form_start(form) }}
+        {{ form_row(form.setlist) }}
+        {{ form_widget(form.sheets) }}
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
