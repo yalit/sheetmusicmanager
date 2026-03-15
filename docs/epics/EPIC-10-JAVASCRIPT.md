@@ -1,8 +1,7 @@
 # Epic 10: JavaScript Integration
 
-**Branch**: `epic/10-javascript`
-**Status**: ⏳ Pending
-**Estimated Effort**: 3-4 hours
+**Branch**: `epic/10-dnd-reorder`
+**Status**: Done
 **Dependencies**: Epic 3 (Basic Admin), Epic 1 (Stimulus setup)
 
 ---
