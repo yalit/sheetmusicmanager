@@ -69,6 +69,7 @@
         'data-table-collection-field': 'true',
         'data-allow-add': allow_add|default(false) ? 'true' : 'false',
         'data-allow-delete': allow_delete|default(false) ? 'true' : 'false',
+        'data-allow-sort': allow_sort|default(false) ? 'true' : 'false',
         'data-num-items': form.children is empty ? 0 : maxKey + 1,
         'data-form-type-name-placeholder': form.vars.prototype is defined ? form.vars.prototype.vars.name : '',
     }) %}
@@ -80,6 +81,7 @@
     <table class="table table-sm table-collection">
         <thead>
             <tr>
+                {% if allow_sort|default(false) %}<th class="table-collection-col-sort"></th>{% endif %}
                 {% if allow_delete|default(false) %}<th class="table-collection-col-delete"></th>{% endif %}
                 {% for child in form.vars.prototype %}
                     {% if child.vars.block_prefixes|filter(p => p starts with 'ea_form_')|length == 0 %}
@@ -90,7 +92,12 @@
         </thead>
         <tbody data-table-collection-body>
             {% for entry in form %}
-                <tr>
+                <tr data-row-index="{{ loop.index0 }}">
+                    {% if allow_sort|default(false) %}
+                        <td class="table-collection-col-sort">
+                            <i class="fa fa-grip-vertical drag-handle" title="Drag to reorder"></i>
+                        </td>
+                    {% endif %}
                     {% if allow_delete|default(false) %}
                         <td class="table-collection-col-delete">
                             <button type="button" class="btn btn-sm btn-outline-danger table-collection-delete" title="Remove">
@@ -111,7 +118,12 @@
     {% if form.vars.prototype is defined %}
         {% set proto = form.vars.prototype %}
         <template data-table-prototype>
-            <tr>
+            <tr data-row-index="__index__">
+                {% if allow_sort|default(false) %}
+                    <td class="table-collection-col-sort">
+                        <i class="fa fa-grip-vertical drag-handle" title="Drag to reorder"></i>
+                    </td>
+                {% endif %}
                 {% if allow_delete|default(false) %}
                     <td class="table-collection-col-delete">
                         <button type="button" class="btn btn-sm btn-outline-danger table-collection-delete" title="Remove">

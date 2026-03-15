@@ -3,6 +3,7 @@ import './stimulus_bootstrap.js';
 import './admin/pdf_field_input.js'
 import './admin/autocomplete_field_input.js'
 import './admin/collection_table.js'
+import './admin/collection_table_sortable.js'
 
 /*
  * Welcome to your app's main JavaScript file!
