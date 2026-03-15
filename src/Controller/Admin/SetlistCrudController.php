@@ -93,6 +93,7 @@ class SetlistCrudController extends AbstractCrudController
             ->useEntryCrudForm(SetlistItemCrudController::class)
             ->allowAdd()
             ->allowDelete()
+            ->setFormTypeOption('allow_sort', true)
         ;
     }
 }

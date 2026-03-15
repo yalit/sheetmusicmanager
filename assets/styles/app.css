@@ -15,6 +15,28 @@
         width: 44px;
     }
 
+    .table-collection-col-sort {
+        width: 32px;
+    }
+
+    .drag-handle {
+        cursor: grab;
+        color: #adb5bd;
+        padding: 4px;
+
+        &:hover {
+            color: #495057;
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    .sortable-ghost {
+        opacity: 0.4;
+    }
+
     td {
         vertical-align: middle;
     }

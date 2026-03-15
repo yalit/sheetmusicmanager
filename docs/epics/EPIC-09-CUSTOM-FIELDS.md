@@ -1,13 +1,16 @@
 # Epic 9: Custom Fields & Form Extensions
 
-**Branch**: `epic/09-custom-fields`
-**Status**: ⏳ Pending
-**Estimated Effort**: 2-3 hours
+**Branch**: N/A — skipped
+**Status**: ⏭️ Skipped
 **Dependencies**: Epic 3 (Basic Admin)
 
 ---
 
-## Goal
+## Status Note
+
+Skipped. The features described in this epic (custom collection fields, form panels, value object display) were implemented as part of earlier epics and are already in production. The entity model in this doc (difficulty, keySignature, genre, SheetReference DTO, VichUploader, etc.) does not match the actual codebase and is obsolete.
+
+## Original Goal (obsolete)
 
 Implement custom field types and form extensions to handle complex data structures like the SheetReference DTO collection and conditional form fields.
 

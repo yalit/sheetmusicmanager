@@ -167,6 +167,26 @@ final class SetlistCrudControllerTest extends AbstractAdminTestCase
         ];
     }
 
+    public function testEditFormHasSortableAttributeOnItemsWidget(): void
+    {
+        $setlist = $this->getSetlist(MemberRole::Member);
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->generateEditFormUrl($setlist->getId()));
+
+        static::assertResponseIsSuccessful();
+        static::assertSelectorExists('[data-allow-sort="true"]');
+    }
+
+    public function testEditFormPrototypeContainsDragHandle(): void
+    {
+        $setlist = $this->getSetlist(MemberRole::Member);
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->generateEditFormUrl($setlist->getId()));
+
+        static::assertResponseIsSuccessful();
+        static::assertSelectorExists('[data-table-prototype] .drag-handle');
+    }
+
     #[DataProvider('getSetlistRightsForDelete')]
     public function testDeleteAccess(MemberRole $role, MemberRole $setlistOwner, bool $isPermitted, bool $canViewIndex): void
     {
