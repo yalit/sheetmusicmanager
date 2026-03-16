@@ -177,6 +177,24 @@ final class SheetCrudControllerTest extends AbstractAdminTestCase
         }
     }
 
+    public function testSearchByRefReturnsMatchingSheets(): void
+    {
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->generateIndexUrl('BWV565'));
+
+        static::assertResponseIsSuccessful();
+        $this->assertIndexFullEntityCount(1);
+    }
+
+    public function testSearchByAnotherRefReturnsExactlyOneResult(): void
+    {
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->generateIndexUrl('K525'));
+
+        static::assertResponseIsSuccessful();
+        $this->assertIndexFullEntityCount(1);
+    }
+
     public function testExportAnonymousRedirectsToLogin(): void
     {
         $this->client->request('GET', $this->getCrudUrl('export'));

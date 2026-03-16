@@ -60,7 +60,7 @@ class SheetCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Sheet')
             ->setEntityLabelInPlural('Sheets')
-            ->setSearchFields(['title', 'tags'])
+            ->setSearchFields(['title', 'tags', 'refs', 'notes'])
         ;
     }
 
