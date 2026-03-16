@@ -1,7 +1,7 @@
 # Epic 11: Advanced Features
 
 **Branch**: `epic/11-advanced`
-**Status**: ⏳ Pending
+**Status**: ✅ Complete
 **Dependencies**: Epic 3 (Basic Admin), Epic 8 (Actions)
 
 ---
@@ -142,10 +142,10 @@ for search produces duplicate rows on the index without extra deduplication work
 
 ## Epic Acceptance Criteria
 
-- [ ] Export CSV button on Sheet index
-- [ ] Exported data respects active filters and search
-- [ ] Search covers title, tags, refs, notes
-- [ ] No regressions on existing filters
+- [x] Export CSV button on Sheet index
+- [x] Exported data respects active filters and search
+- [x] Search covers title, tags, refs, notes
+- [x] No regressions on existing filters
 
 ---
 
