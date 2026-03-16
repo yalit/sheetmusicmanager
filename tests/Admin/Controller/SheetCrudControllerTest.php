@@ -176,4 +176,35 @@ final class SheetCrudControllerTest extends AbstractAdminTestCase
             self::assertIndexEntityActionNotExists(Action::DELETE, $sheet->getId() ?? '');
         }
     }
+
+    public function testExportAnonymousRedirectsToLogin(): void
+    {
+        $this->client->request('GET', $this->getCrudUrl('export'));
+        static::assertResponseRedirects('/login');
+    }
+
+    public function testExportReturnsCsvForAuthenticatedUser(): void
+    {
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->getCrudUrl('export'));
+
+        static::assertResponseIsSuccessful();
+        static::assertResponseHeaderSame('Content-Type', 'text/csv; charset=UTF-8');
+        static::assertStringContainsString(
+            'attachment; filename="sheets-',
+            $this->client->getResponse()->headers->get('Content-Disposition') ?? ''
+        );
+    }
+
+    public function testExportCsvContainsHeaderRow(): void
+    {
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->getCrudUrl('export'));
+
+        $content = $this->client->getInternalResponse()->getContent();
+        static::assertStringContainsString('ID', $content);
+        static::assertStringContainsString('Title', $content);
+        static::assertStringContainsString('Refs', $content);
+        static::assertStringContainsString('Credits', $content);
+    }
 }
