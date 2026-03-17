@@ -1,7 +1,7 @@
 # Epic 12: Demo Data & Testing
 
 **Branch**: `epic/12-demo-data`
-**Status**: ⏳ Pending
+**Status**: ✅ Complete
 **Dependencies**: All previous epics (1-11)
 
 ---
@@ -97,12 +97,12 @@ All fixture classes already exist. The data is minimal (test-oriented):
 
 ## Epic Acceptance Criteria
 
-- [ ] 10–15 persons in fixtures
-- [ ] ~20 sheets with varied data and credits
-- [ ] All setlists have items with positions
-- [ ] `bin/console doctrine:fixtures:load` runs without errors
-- [ ] Existing tests still pass after fixture changes
-- [ ] Testing checklist complete
+- [x] 10–15 persons in fixtures
+- [x] ~20 sheets with varied data and credits
+- [x] All setlists have items with positions
+- [x] `bin/console doctrine:fixtures:load` runs without errors
+- [x] Existing tests still pass after fixture changes
+- [x] Testing checklist complete
 
 ---
 
