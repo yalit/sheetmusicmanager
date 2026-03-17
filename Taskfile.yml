@@ -65,10 +65,8 @@ tasks:
         desc: Full project setup (install, migrate, load fixtures)
         cmds:
             - composer install
-            - task: setup-db
+            - task: reset
               vars: {ENV: 'dev'}
-            - mkdir -p public/uploads/sheets
-            - task: copy-testfiles
 
     reset:
         desc: Drop and recreate the database, then reload fixtures
@@ -92,13 +90,10 @@ tasks:
             vars:
                 - name: BRANCH
                   enum:
-                      - epic/01-setup
-                      - epic/02-entities
                       - epic/03-easyadmin
                       - epic/04-authentication
                       - epic/07-filters
                       - epic/08-actions
-                      - epic/09-custom-fields
                       - epic/10-dnd-reorder
                       - epic/11-advanced
                       - epic/13-presentation
@@ -106,7 +101,4 @@ tasks:
         cmds:
             - git stash
             - git checkout "{{.BRANCH}}"
-            - composer install --quiet
-            - task: setup-db
-              vars: {ENV: 'dev'}
-            - task: copy-testfiles
+            - task: install
