@@ -27,6 +27,7 @@ class SheetFixtures extends Fixture implements DependentFixtureInterface
     public const SHEET_12_REF = 'sheet-12';
     public const SHEET_13_REF = 'sheet-13';
     public const SHEET_14_REF = 'sheet-14';
+    public const MISSING_FILE_REF = 'missing_file';
 
     // Existing entries must stay at indexes 0 and 1 — tests depend on SHEETS[0][0] and SHEETS[1][0]
     public const SHEETS = [
@@ -44,6 +45,7 @@ class SheetFixtures extends Fixture implements DependentFixtureInterface
         ['Nocturne in E flat Major',     ['Op9-2'],   ['piano', 'romantic'],             self::SHEET_12_REF],
         ['Liebestraum No. 3',            [],          ['piano', 'romantic'],             self::SHEET_13_REF],
         ['Boléro',                       [],          ['orchestra', 'modern'],           self::SHEET_14_REF],
+        ['No file on the drive',         [],          [],           self::MISSING_FILE_REF],
     ];
 
     // [sheetRef, composerPersonRef, arrangerPersonRef|null, notes]
@@ -62,6 +64,7 @@ class SheetFixtures extends Fixture implements DependentFixtureInterface
         self::SHEET_12_REF => [PersonFixtures::CHOPIN_REF,     null,                       null],
         self::SHEET_13_REF => [PersonFixtures::LISZT_REF,      null,                       null],
         self::SHEET_14_REF => [PersonFixtures::RAVEL_REF,      null,                       null],
+        self::MISSING_FILE_REF => [null, null, null],
     ];
 
     public function getDependencies(): array
@@ -81,7 +84,7 @@ class SheetFixtures extends Fixture implements DependentFixtureInterface
                 ->setTitle($title)
                 ->setRefs($refs)
                 ->setTags($tags)
-                ->setFiles([StoredFile::fromArray(['name' => $ref, 'filename' => $ref])])
+                ->setFiles([StoredFile::fromArray(['name' => $ref, 'filename' => $ref.'.pdf'])])
             ;
 
             [$composerRef, $arrangerRef, $notes] = self::CREDITS[$ref];

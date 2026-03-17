@@ -17,8 +17,8 @@ class SetlistFixtures extends Fixture implements DependentFixtureInterface
     public const CONTRIBUTOR_SETLIST_REF = 'setlist-contributor';
     public const LIBRARIAN_SETLIST_REF   = 'setlist-librarian';
     public const ADMIN_SETLIST_REF       = 'setlist-admin';
-
-    public function __construct(private readonly Connection $connection) {}
+    public const EMPTY_SETLIST_REF       = 'setlist-empty';
+    public const MISSING_FILES_REF       = 'missing-files';
 
     public function getDependencies(): array
     {
@@ -62,6 +62,22 @@ class SetlistFixtures extends Fixture implements DependentFixtureInterface
                     [SheetFixtures::SHEET_12_REF, 3, 'Nocturne'],
                     [SheetFixtures::SHEET_13_REF, 4, 'Rêverie'],
                     [SheetFixtures::SHEET_14_REF, 5, 'Grand finale'],
+                ],
+            ],
+            [
+                'title'      => 'Empty Setlist',
+                'date'       => new \DateTime('2025-01-01'),
+                'owner'      => MemberRole::Member->value.'@sheetmusic.test',
+                'ref'        => self::EMPTY_SETLIST_REF,
+                'items'      => [],
+            ],
+            [
+                'title'      => 'Missing files Setlist',
+                'date'       => new \DateTime('2025-01-01'),
+                'owner'      => MemberRole::Member->value.'@sheetmusic.test',
+                'ref'        => self::MISSING_FILES_REF,
+                'items'      => [
+                    [SheetFixtures::MISSING_FILE_REF,  1, 'Entrée'],
                 ],
             ],
             [

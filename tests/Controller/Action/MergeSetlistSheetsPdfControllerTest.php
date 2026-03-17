@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller\Action;
 
+use App\DataFixtures\SetlistFixtures;
 use App\Entity\Member;
 use App\Entity\SetListItem;
 use App\Entity\Setlist;
@@ -89,7 +90,8 @@ final class MergeSetlistSheetsPdfControllerTest extends WebTestCase
     public function testSetlistWithNoItemsRedirectsWithWarning(): void
     {
         $this->loginAs(MemberRole::Librarian);
-        $setlist = $this->getSetlist(MemberRole::Member);
+        $setlist = $this->em()->getRepository(Setlist::class)->findOneBy(['title' => 'Empty Setlist']);
+        static::assertNotNull($setlist, 'Fixture setlist "Empty Setlist" not found');
 
         $this->client->request('GET', $this->actionUrl($setlist));
 
@@ -106,17 +108,7 @@ final class MergeSetlistSheetsPdfControllerTest extends WebTestCase
     {
         $this->loginAs(MemberRole::Librarian);
 
-        $em = $this->em();
-
-        $sheet = (new Sheet())->setTitle('Missing File Sheet')->setFiles([
-            new StoredFile('missing.pdf', 'missing_file_that_does_not_exist.pdf'),
-        ]);
-        $em->persist($sheet);
-
-        $setlist = $this->getSetlist(MemberRole::Librarian);
-        $item    = (new SetListItem())->setPosition(1)->setName('')->setNotes('')->setSheet($sheet);
-        $setlist->addItem($item);
-        $em->flush();
+        $setlist = $this->em()->getRepository(Setlist::class)->findOneBy(['title' => 'Missing files Setlist']);
 
         $this->client->request('GET', $this->actionUrl($setlist));
 

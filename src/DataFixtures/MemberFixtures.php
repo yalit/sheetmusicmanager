@@ -14,6 +14,7 @@ class MemberFixtures extends Fixture
     public const CONTRIBUTOR_REF = 'member-contributor';
     public const LIBRARIAN_REF   = 'member-librarian';
     public const ADMIN_REF       = 'member-admin';
+    public const NOT_USED_REF       = 'member-notused';
 
     public function __construct(private readonly UserPasswordHasherInterface $hasher) {}
 
@@ -24,6 +25,7 @@ class MemberFixtures extends Fixture
             [MemberRole::Contributor, MemberRole::Contributor->value.'@sheetmusic.test', self::CONTRIBUTOR_REF],
             [MemberRole::Librarian,   MemberRole::Librarian->value.'@sheetmusic.test',   self::LIBRARIAN_REF],
             [MemberRole::Admin,       MemberRole::Admin->value.'@sheetmusic.test',       self::ADMIN_REF],
+            [MemberRole::Member,      'notused@heetmusic.test',       self::NOT_USED_REF],
         ] as [$role, $email, $ref]) {
             $member = (new Member())
                 ->setEmail($email)
