@@ -6,12 +6,13 @@ vars:
     SYMFONY: symfony
     CONSOLE: symfony console
 
+silent: true
+
 tasks:
     default:
         desc: List available tasks
         cmds:
             - task --list
-        silent: true
 
     # Server
     up:
@@ -35,17 +36,69 @@ tasks:
     migrate:
         desc: Execute the pending migrations
         cmds:
-            - "{{.CONSOLE}} d:m:m"
+            - "{{.CONSOLE}} d:m:m --no-interaction"
+
+    setup-db:
+        desc: setup the db with fixtures
+        internal: true
+        vars:
+            ENV: '{{ default "dev" .ENV}}'
+        cmds:
+            - "{{.CONSOLE}} doctrine:migrations:migrate --no-interaction --env={{.ENV}}"
+            - "{{.CONSOLE}} doctrine:fixtures:load --no-interaction --env={{.ENV}}"
 
     # Test
     test-init:
         desc: Init test environment
         cmds:
             - rm -f var/data_test.db
-            - "{{.CONSOLE}} d:m:m --env=test --no-interaction"
-            - "{{.CONSOLE}} d:f:l --env=test --no-interaction"
+            - task: setup-db
+              vars: {ENV: 'test'}
 
     tests:
         desc: Run tests
         cmds:
             - bin/phpunit --testdox
+
+    # Setup
+    install:
+        desc: Full project setup (install, migrate, load fixtures)
+        cmds:
+            - composer install
+            - task: reset
+              vars: {ENV: 'dev'}
+
+    reset:
+        desc: Drop and recreate the database, then reload fixtures
+        cmds:
+            - rm -f var/data_dev.db
+            - task: setup-db
+              vars: {ENV: 'dev'}
+            - task: copy-testfiles
+
+    copy-testfiles:
+        desc: copy all the sheets test files from the tests to the public
+        internal: true
+        cmds:
+            - rm -rf public/uploads/sheets/*
+            - cp tests/public/uploads/sheets/* public/uploads/sheets/
+
+    # Branch switching
+    checkout:
+        desc: Switch to a demo branch and reload fixtures
+        requires:
+            vars:
+                - name: BRANCH
+                  enum:
+                      - epic/03-easyadmin
+                      - epic/04-authentication
+                      - epic/07-filters
+                      - epic/08-actions
+                      - epic/10-dnd-reorder
+                      - epic/11-advanced
+                      - epic/13-presentation
+                      - main
+        cmds:
+            - git stash
+            - git checkout "{{.BRANCH}}"
+            - task: install
