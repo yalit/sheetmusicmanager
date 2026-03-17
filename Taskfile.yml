@@ -94,7 +94,6 @@ tasks:
                       - epic/04-authentication
                       - epic/07-filters
                       - epic/08-actions
-                      - epic/09-custom-fields
                       - epic/10-dnd-reorder
                       - epic/11-advanced
                       - epic/13-presentation
