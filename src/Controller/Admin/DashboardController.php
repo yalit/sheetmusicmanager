@@ -52,15 +52,15 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::section('Administration');
-        yield MenuItem::linkToCrud('Members', 'fa fa-users', Member::class)
+        yield MenuItem::linkTo(MemberCrudController::class,'Members', 'fa fa-users')
             ->setPermission('ROLE_LIBRARIAN');
 
         yield MenuItem::section('Partitions');
-        yield MenuItem::linkToCrud('Person Types', 'fa fa-tags', PersonType::class);
-        yield MenuItem::linkToCrud('Persons', 'fa fa-user', Person::class);
-        yield MenuItem::linkToCrud('Sheets', 'fa fa-music', Sheet::class);
+        yield MenuItem::linkTo(PersonTypeCrudController::class, 'Person Types', 'fa fa-tags');
+        yield MenuItem::linkTo(PersonCrudController::class, 'Persons', 'fa fa-user');
+        yield MenuItem::linkTo(SheetCrudController::class, 'Sheets', 'fa fa-music');
 
         yield MenuItem::section('Performances');
-        yield MenuItem::linkToCrud('Setlists', 'fa fa-list', Setlist::class);
+        yield MenuItem::linkTo(SetlistCrudController::class, 'Setlists', 'fa fa-list');
     }
 }
