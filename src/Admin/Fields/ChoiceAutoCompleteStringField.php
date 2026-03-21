@@ -5,6 +5,7 @@ namespace App\Admin\Fields;
 use App\Admin\Type\StringAutoCompleteType;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 
 /**
@@ -15,7 +16,7 @@ class ChoiceAutoCompleteStringField implements FieldInterface
 {
     use FieldTrait;
 
-    public static function new(string $propertyName, ?string $label = null): self
+    public static function new(string $propertyName, string|TranslatableInterface|bool|null $label = null): self
     {
         return (new self())
             ->setProperty($propertyName)
