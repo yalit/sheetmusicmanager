@@ -58,7 +58,7 @@ class SheetCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->hideOnForm();
         yield FormField::addColumn(8);
-        yield FormField::addPanel("General");
+        yield FormField::addFieldset("General");
         yield TextField::new('title', 'Titre')->setColumns(8);
 
         yield PDFField::new('files', 'Fichier PDF')
@@ -66,7 +66,7 @@ class SheetCrudController extends AbstractCrudController
             ->setRequired($pageName === Crud::PAGE_NEW);
 
         yield FormField::addColumn(4);
-        yield FormField::addPanel("Details");
+        yield FormField::addFieldset("Details");
         yield ChoiceAutoCompleteStringField::new('refs')
             ->setChoices([$this->sheetRepository, 'getAllRefs']);
         yield ChoiceAutoCompleteStringField::new('tags')
