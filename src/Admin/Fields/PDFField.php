@@ -6,6 +6,7 @@ use App\Admin\Type\SheetFileType;
 use App\Entity\ValueObject\StoredFile;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 
 /**
@@ -20,7 +21,7 @@ class PDFField implements FieldInterface
 {
     use FieldTrait;
 
-    public static function new(string $propertyName, ?string $label = null): PDFField
+    public static function new(string $propertyName, string|TranslatableInterface|bool|null $label = null): PDFField
     {
         return (new self())
             ->setProperty($propertyName)
