@@ -218,7 +218,7 @@ class SheetCrudController extends AbstractCrudController
     private function getIndexQueryBuilder(AdminContext $context): QueryBuilder
     {
         $entityDto = $this->container->get(EntityFactory::class)->create(static::getEntityFqcn());
-        $fields    = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
+        $fields    = new FieldCollection($this->configureFields(Crud::PAGE_INDEX));
         $filters   = $this->container->get(FilterFactory::class)->create(
             $context->getCrud()?->getFiltersConfig() ?? new FilterConfigDto(),
             $fields,
