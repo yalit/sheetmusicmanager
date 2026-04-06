@@ -9,7 +9,7 @@ A sheet music library manager for choirs, bands, and orchestras — realistic en
 ## Stack
 
 - **Symfony 7** — framework
-- **EasyAdmin 4** — admin panel
+- **EasyAdmin 5** — admin panel
 - **Doctrine ORM** — SQLite
 - **importmap** — asset management (no Webpack/Node)
 - **SortableJS** — drag-and-drop reorder (plain JS, no Stimulus)
