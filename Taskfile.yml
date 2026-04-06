@@ -102,3 +102,11 @@ tasks:
             - git stash
             - git checkout "{{.BRANCH}}"
             - task: install
+
+
+    # presentation
+    present:
+        desc: Start the presentation deck from docs/presentation
+        dir: docs/presentation
+        cmds:
+            - pnpm dev
