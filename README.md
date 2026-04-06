@@ -106,7 +106,6 @@ Each `epic/XX` branch is a self-contained snapshot. Branches build on each other
 | `epic/04-authentication` | Login, roles, voters, security |
 | `epic/07-filters` | Custom filters (`HasPdfFilter`, tag filter) |
 | `epic/08-actions` | Custom actions (duplicate, PDF, merge, batch add) |
-| `epic/09-custom-fields` | `CollectionTableField` custom form type |
 | `epic/10-dnd-reorder` | Drag-and-drop reorder on setlist items |
 | `epic/11-advanced` | CSV export with filter awareness, extended search |
 | `epic/12-demo-data` | Enriched fixtures (14 sheets, 14 persons, setlist items) |
