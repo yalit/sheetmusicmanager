@@ -1,6 +1,6 @@
 # Sheet Music Manager
 
-Demo application for the talk **"Building Admin Panels with EasyAdmin 4"**.
+Demo application for an advanced usage for EasyAdmin 5
 
 A sheet music library manager for choirs, bands, and orchestras — realistic enough to illustrate non-trivial EasyAdmin patterns without being a toy example.
 
