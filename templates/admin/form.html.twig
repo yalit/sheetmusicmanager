@@ -1,6 +1,8 @@
 {% macro file_row() %}
     <li class="loaded_file">
-        <span data-new-filename="__FILENAME__" class="loaded_file__remove">&times;</span>
+        <span {{ stimulus_action('pdf-field-input', 'deleteNew') }}
+              data-pdf-field-input-filename-param="__FILENAME__"
+              class="loaded_file__remove">&times;</span>
         <span class="loaded_file__name">__FILENAME__</span>
         <span class="loaded_file__size">(__FILESIZE__)</span>
     </li>
@@ -8,41 +10,48 @@
 
 {% block app_pdf_field_widget %}
     {% set existing_files = existing_files|default([]) %}
-    <div id="app_pdf_field">
-        {{ form_widget(form, {id:"app_pdf_field_input"}) }}
+    <div id="app_pdf_field" {{ stimulus_controller('pdf-field-input') }}>
+        {{ form_widget(form, {id: "app_pdf_field_input", attr: {
+            'data-pdf-field-input-target': 'fileInput',
+            'data-action': 'change->pdf-field-input#fileChanged',
+        }}) }}
         <div class="loaded_files_header">Fichiers</div>
         {% if existing_files is not empty %}
-            <ul class="loaded_files_existing">
+            <ul class="loaded_files_existing" {{ stimulus_target('pdf-field-input', 'existingFileList') }}>
                 {% for file in existing_files %}
                     <li class="loaded_file">
-                        <span data-file="{{ file | json_encode}}" class="loaded_file__remove">&times;</span>
+                        <span {{ stimulus_action('pdf-field-input', 'deleteExisting') }}
+                              data-pdf-field-input-file-param="{{ file | json_encode }}"
+                              class="loaded_file__remove">&times;</span>
                         <a href="{{ webpath(file) }}" target="_blank" class="loaded_file__name loaded_file__link">{{ file.name }}</a>
                         <span class="loaded_file__size">({{ filesize(file) }})</span>
                     </li>
                 {% endfor %}
             </ul>
         {% endif %}
-        <p class="loaded_files_empty" {% if existing_files is not empty %}style="display: none"{% endif %}>Pas de fichiers</p>
-        <ul class="loaded_files" style="display: none">
-        </ul>
+        <p class="loaded_files_empty" {{ stimulus_target('pdf-field-input', 'emptyMessage') }}
+           {% if existing_files is not empty %}style="display: none"{% endif %}>Pas de fichiers</p>
+        <ul class="loaded_files" {{ stimulus_target('pdf-field-input', 'fileList') }} style="display: none"></ul>
         <input type="hidden" id="app_pdf_field_kept" name="app_pdf_field_kept"
+               {{ stimulus_target('pdf-field-input', 'kept') }}
                value="{{ existing_files | json_encode }}">
         <input type="hidden" id="app_pdf_field_removed" name="app_pdf_field_removed"
+               {{ stimulus_target('pdf-field-input', 'removed') }}
                value="{{ [] | json_encode }}">
+        <template {{ stimulus_target('pdf-field-input', 'template') }}>
+            {{ _self.file_row() }}
+        </template>
     </div>
-    <template id="pdf_field_file">
-        {{ _self.file_row() }}
-    </template>
 {% endblock %}
 
 
 {% block app_autocomplete_widget %}
     {{ form_widget(form, {'attr': {
-        'autocomplete': true,
-        'data-choices': form.vars.choices | json_encode,
-        'data-separator': form.vars.separator ?? ',',
-        'data-create': form.vars.create ?? '',
-        'data-multiple': form.vars.multiple ?? ''
+        'data-controller': 'autocomplete-field-input',
+        'data-autocomplete-field-input-choices-value': form.vars.choices | json_encode,
+        'data-autocomplete-field-input-separator-value': form.vars.separator ?? ',',
+        'data-autocomplete-field-input-create-value': form.vars.create ? 'true' : 'false',
+        'data-autocomplete-field-input-multiple-value': form.vars.multiple ? 'true' : 'false',
     }}) }}
 {% endblock %}
 
@@ -51,8 +60,8 @@
    table_collection_row    : sets data-* attrs on the row container; calls
                              block('form_row') for the outer structure.
    table_collection_widget : renders existing entries as <tr> rows, plus a
-                             <template data-table-prototype> holding the
-                             prototype row (avoids HTML-attribute escaping).
+                             <template> holding the prototype row (avoids
+                             HTML-attribute escaping).
    ─────────────────────────────────────────────────────────────────────────── #}
 
 {% block table_collection_row %}
@@ -65,13 +74,15 @@
         {% endif %}
     {% endfor %}
 
+    {# row_attr is a PHP array — stimulus_controller() outputs a string, so
+       the controller and its values must be set as individual data attributes #}
     {% set row_attr = row_attr|merge({
-        'data-table-collection-field': 'true',
+        'data-controller': 'collection-table',
         'data-allow-add': allow_add|default(false) ? 'true' : 'false',
         'data-allow-delete': allow_delete|default(false) ? 'true' : 'false',
-        'data-allow-sort': allow_sort|default(false) ? 'true' : 'false',
-        'data-num-items': form.children is empty ? 0 : maxKey + 1,
-        'data-form-type-name-placeholder': form.vars.prototype is defined ? form.vars.prototype.vars.name : '',
+        'data-collection-table-allow-sort-value': allow_sort|default(false) ? 'true' : 'false',
+        'data-collection-table-num-items-value': form.children is empty ? 0 : maxKey + 1,
+        'data-collection-table-name-placeholder-value': form.vars.prototype is defined ? form.vars.prototype.vars.name : '',
     }) %}
 
     {{ block('form_row') }}
@@ -90,7 +101,7 @@
                 {% endfor %}
             </tr>
         </thead>
-        <tbody data-table-collection-body>
+        <tbody {{ stimulus_target('collection-table', 'body') }}>
             {% for entry in form %}
                 <tr data-row-index="{{ loop.index0 }}">
                     {% if allow_sort|default(false) %}
@@ -100,7 +111,8 @@
                     {% endif %}
                     {% if allow_delete|default(false) %}
                         <td class="table-collection-col-delete">
-                            <button type="button" class="btn btn-sm btn-outline-danger table-collection-delete" title="Remove">
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    {{ stimulus_action('collection-table', 'delete') }} title="Remove">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </td>
@@ -117,7 +129,7 @@
     </table>
     {% if form.vars.prototype is defined %}
         {% set proto = form.vars.prototype %}
-        <template data-table-prototype>
+        <template {{ stimulus_target('collection-table', 'prototype') }}>
             <tr data-row-index="__index__">
                 {% if allow_sort|default(false) %}
                     <td class="table-collection-col-sort">
@@ -126,7 +138,8 @@
                 {% endif %}
                 {% if allow_delete|default(false) %}
                     <td class="table-collection-col-delete">
-                        <button type="button" class="btn btn-sm btn-outline-danger table-collection-delete" title="Remove">
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                {{ stimulus_action('collection-table', 'delete') }} title="Remove">
                             <i class="fa fa-trash"></i>
                         </button>
                     </td>
@@ -141,7 +154,8 @@
         </template>
     {% endif %}
     {% if allow_add|default(false) %}
-        <button type="button" class="btn btn-sm btn-outline-secondary table-collection-add mt-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
+                {{ stimulus_action('collection-table', 'add') }}>
             <i class="fa fa-plus"></i> Add item
         </button>
     {% endif %}

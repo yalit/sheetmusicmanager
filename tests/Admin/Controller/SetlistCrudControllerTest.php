@@ -174,7 +174,7 @@ final class SetlistCrudControllerTest extends AbstractAdminTestCase
         $this->client->request('GET', $this->generateEditFormUrl($setlist->getId()));
 
         static::assertResponseIsSuccessful();
-        static::assertSelectorExists('[data-allow-sort="true"]');
+        static::assertSelectorExists('[data-collection-table-allow-sort-value="true"]');
     }
 
     public function testEditFormPrototypeContainsDragHandle(): void
@@ -184,7 +184,7 @@ final class SetlistCrudControllerTest extends AbstractAdminTestCase
         $this->client->request('GET', $this->generateEditFormUrl($setlist->getId()));
 
         static::assertResponseIsSuccessful();
-        static::assertSelectorExists('[data-table-prototype] .drag-handle');
+        static::assertSelectorExists('[data-collection-table-target="prototype"] .drag-handle');
     }
 
     #[DataProvider('getSetlistRightsForDelete')]
