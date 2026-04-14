@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260317190241 extends AbstractMigration
+final class Version20260414122337 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -33,6 +33,8 @@ final class Version20260317190241 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_2835F3D8B1206A5 ON set_list_item (sheet_id)');
         $this->addSql('CREATE TABLE setlist (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title VARCHAR(255) NOT NULL, date DATE DEFAULT NULL, notes CLOB NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, created_by VARCHAR(255) DEFAULT NULL, updated_by VARCHAR(255) DEFAULT NULL)');
         $this->addSql('CREATE TABLE sheet (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title VARCHAR(255) NOT NULL, tags CLOB DEFAULT NULL, notes CLOB DEFAULT NULL, refs CLOB DEFAULT NULL, files value_object_array NOT NULL, full_path VARCHAR(255) DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, created_by VARCHAR(255) DEFAULT NULL, updated_by VARCHAR(255) DEFAULT NULL)');
+        $this->addSql('CREATE TABLE web_dav_token (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, hashed_token VARCHAR(255) NOT NULL, expires_at DATETIME NOT NULL, member_id INTEGER NOT NULL, CONSTRAINT FK_CE1EACE27597D3FE FOREIGN KEY (member_id) REFERENCES member (id) NOT DEFERRABLE INITIALLY IMMEDIATE)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_CE1EACE27597D3FE ON web_dav_token (member_id)');
         $this->addSql('CREATE TABLE messenger_messages (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, body CLOB NOT NULL, headers CLOB NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL, available_at DATETIME NOT NULL, delivered_at DATETIME DEFAULT NULL)');
         $this->addSql('CREATE INDEX IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750 ON messenger_messages (queue_name, available_at, delivered_at, id)');
     }
@@ -47,6 +49,7 @@ final class Version20260317190241 extends AbstractMigration
         $this->addSql('DROP TABLE set_list_item');
         $this->addSql('DROP TABLE setlist');
         $this->addSql('DROP TABLE sheet');
+        $this->addSql('DROP TABLE web_dav_token');
         $this->addSql('DROP TABLE messenger_messages');
     }
 }

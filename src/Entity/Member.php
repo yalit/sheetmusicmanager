@@ -46,6 +46,9 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 50, enumType: MemberRole::class)]
     private MemberRole $role = MemberRole::Member;
 
+    #[ORM\OneToOne(mappedBy: 'member', cascade: ['persist', 'remove'])]
+    private ?WebDavToken $webDavToken = null;
+
     public function eraseCredentials(): void {
         $this->plainPassword = null;
     }
@@ -133,5 +136,22 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
         return $this->name ?? $this->email ?? '';
+    }
+
+    public function getWebDavToken(): ?WebDavToken
+    {
+        return $this->webDavToken;
+    }
+
+    public function setWebDavToken(WebDavToken $webDavToken): static
+    {
+        // set the owning side of the relation if necessary
+        if ($webDavToken->getMember() !== $this) {
+            $webDavToken->setMember($this);
+        }
+
+        $this->webDavToken = $webDavToken;
+
+        return $this;
     }
 }
