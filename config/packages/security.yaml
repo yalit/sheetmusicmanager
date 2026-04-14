@@ -19,6 +19,13 @@ security:
         dev:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
+        webdav:
+            pattern: ^/dav
+            stateless: true
+            provider: app_user_provider
+            custom_authenticators:
+                - App\Security\WebDavAuthenticator
+            entry_point: App\Security\WebDavAuthenticator
         main:
             lazy: true
             provider: app_user_provider
