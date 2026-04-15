@@ -2,11 +2,6 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Member;
-use App\Entity\Person;
-use App\Entity\PersonType;
-use App\Entity\Setlist;
-use App\Entity\Sheet;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;

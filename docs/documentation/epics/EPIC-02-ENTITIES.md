@@ -28,18 +28,13 @@ Create all Doctrine entities with proper fields, relationships, enums, and repos
 - [X] Add validation constraints
 
 **Entity Code** (`src/Entity/Organization.php`):
+
 ```php
 <?php
 
 namespace App\Entity;
 
-use App\Repository\OrganizationRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Blameable\Traits\BlameableEntity;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Security\Member;use App\Entity\Setlist\Setlist;use App\Entity\Sheet\CreditedPerson;use App\Entity\Sheet\Person;use App\Entity\Sheet\Sheet;use App\Repository\OrganizationRepository;use Doctrine\Common\Collections\ArrayCollection;use Doctrine\Common\Collections\Collection;use Doctrine\ORM\Mapping as ORM;use Gedmo\Blameable\Traits\BlameableEntity;use Gedmo\Timestampable\Traits\TimestampableEntity;use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
 class Organization

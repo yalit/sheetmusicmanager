@@ -474,18 +474,13 @@ export default class extends Controller {
 **Technical Details**:
 
 **Reorder Endpoint** (`src/Controller/Admin/SetlistItemReorderController.php`):
+
 ```php
 <?php
 
 namespace App\Controller\Admin;
 
-use App\Entity\Setlist;
-use App\Entity\SetlistItem;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Setlist\Setlist;use App\Entity\Setlist\SetlistItem;use Doctrine\ORM\EntityManagerInterface;use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;use Symfony\Component\HttpFoundation\JsonResponse;use Symfony\Component\HttpFoundation\Request;use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/setlist')]
 class SetlistItemReorderController extends AbstractController

@@ -2,13 +2,12 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Setlist;
-use App\Entity\SetListItem;
-use App\Entity\Sheet;
-use App\Enum\MemberRole;
+use App\Entity\Setlist\Setlist;
+use App\Entity\Setlist\SetListItem;
+use App\Entity\Sheet\Sheet;
+use App\Enum\Security\MemberRole;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ObjectManager;
 
 class SetlistFixtures extends Fixture implements DependentFixtureInterface

@@ -3,7 +3,7 @@
 namespace App\Tests\Admin\Controller;
 
 use App\Controller\Admin\SetlistCrudController;
-use App\Enum\MemberRole;
+use App\Enum\Security\MemberRole;
 use App\Tests\Admin\AbstractAdminTestCase;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use PHPUnit\Framework\Attributes\DataProvider;

@@ -2,7 +2,7 @@
 
 namespace App\MessageHandler;
 
-use App\Entity\SetListItem;
+use App\Entity\Setlist\SetListItem;
 use App\Message\AddSheetsToSetlist;
 use App\Repository\SetlistRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Entity\ValueObject\StoredFile;
+use App\Entity\Sheet\ValueObject\StoredFile;
 use App\Storage\StoredFileStorage;
 use Twig\Attribute\AsTwigFunction;
 

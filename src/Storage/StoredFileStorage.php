@@ -2,7 +2,7 @@
 
 namespace App\Storage;
 
-use App\Entity\ValueObject\StoredFile;
+use App\Entity\Sheet\ValueObject\StoredFile;
 use DateTimeImmutable;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

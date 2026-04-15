@@ -2,8 +2,8 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Member;
-use App\Entity\WebDavToken;
+use App\Entity\Security\Member;
+use App\Entity\WebDAV\WebDavToken;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;

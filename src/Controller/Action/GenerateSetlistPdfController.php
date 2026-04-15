@@ -2,7 +2,7 @@
 
 namespace App\Controller\Action;
 
-use App\Entity\Setlist;
+use App\Entity\Setlist\Setlist;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

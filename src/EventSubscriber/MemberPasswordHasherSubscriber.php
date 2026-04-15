@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\Member;
+use App\Entity\Security\Member;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

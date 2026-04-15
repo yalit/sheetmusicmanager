@@ -2,13 +2,12 @@
 
 namespace App\Tests\Controller\Action;
 
-use App\DataFixtures\SetlistFixtures;
-use App\Entity\Member;
-use App\Entity\SetListItem;
-use App\Entity\Setlist;
-use App\Entity\Sheet;
-use App\Entity\ValueObject\StoredFile;
-use App\Enum\MemberRole;
+use App\Entity\Security\Member;
+use App\Entity\Setlist\Setlist;
+use App\Entity\Setlist\SetListItem;
+use App\Entity\Sheet\Sheet;
+use App\Entity\Sheet\ValueObject\StoredFile;
+use App\Enum\Security\MemberRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

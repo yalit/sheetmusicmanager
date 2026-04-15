@@ -2,7 +2,7 @@
 
 namespace App\Admin\Action;
 
-use App\Entity\Setlist;
+use App\Entity\Setlist\Setlist;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 
 final class DuplicateSetlistAction

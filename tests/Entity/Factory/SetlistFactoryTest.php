@@ -2,10 +2,10 @@
 
 namespace App\Tests\Entity\Factory;
 
-use App\Entity\Factory\SetlistFactory;
-use App\Entity\SetListItem;
-use App\Entity\Setlist;
-use App\Entity\Sheet;
+use App\Entity\Setlist\Factory\SetlistFactory;
+use App\Entity\Setlist\Setlist;
+use App\Entity\Setlist\SetListItem;
+use App\Entity\Sheet\Sheet;
 use PHPUnit\Framework\TestCase;
 
 final class SetlistFactoryTest extends TestCase

@@ -2,8 +2,8 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Member;
-use App\Enum\MemberRole;
+use App\Entity\Security\Member;
+use App\Enum\Security\MemberRole;
 use App\Security\Voter\MemberVoter;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;

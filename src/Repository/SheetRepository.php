@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Sheet;
+use App\Entity\Sheet\Sheet;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -36,10 +36,35 @@ class SheetRepository extends BaseRepository
     {
         $tags = $this->createQueryBuilder('s')
             ->select('s.tags')
-            ->where('s.tags IS NOT NULL')
+            ->where('s.tags is NOT NULL')
             ->getQuery()
             ->getResult();
 
         return array_values(array_filter(array_unique(array_merge(...array_column($tags, 'tags'))), fn(string $s) => $s !== ""));
+    }
+
+    /**
+     * @return Sheet[]
+     */
+    public function findByTag(string $tag): array
+    {
+        $qb = $this->createQueryBuilder('s');
+
+        return $qb
+            ->where('s.tags LIKE :tag')
+            ->setParameter('tag', '%'.$tag.'%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Sheet[]
+     */
+    public function findUntagged(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.tags is null')
+            ->getQuery()
+            ->getResult();
     }
 }

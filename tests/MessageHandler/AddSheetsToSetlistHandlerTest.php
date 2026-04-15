@@ -2,9 +2,9 @@
 
 namespace App\Tests\MessageHandler;
 
-use App\Entity\Setlist;
-use App\Entity\SetListItem;
-use App\Entity\Sheet;
+use App\Entity\Setlist\Setlist;
+use App\Entity\Setlist\SetListItem;
+use App\Entity\Sheet\Sheet;
 use App\Message\AddSheetsToSetlist;
 use App\MessageHandler\AddSheetsToSetlistHandler;
 use App\Repository\SetlistRepository;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Sheet;
 
 use App\Repository\PersonRepository;
 use Doctrine\Common\Collections\ArrayCollection;

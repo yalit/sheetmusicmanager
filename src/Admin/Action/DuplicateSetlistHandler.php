@@ -2,8 +2,8 @@
 
 namespace App\Admin\Action;
 
-use App\Entity\Factory\SetlistFactory;
-use App\Entity\Setlist;
+use App\Entity\Setlist\Factory\SetlistFactory;
+use App\Entity\Setlist\Setlist;
 use App\Repository\SetlistRepository;
 
 final readonly class DuplicateSetlistHandler

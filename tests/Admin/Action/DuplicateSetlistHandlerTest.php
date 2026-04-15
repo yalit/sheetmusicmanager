@@ -4,9 +4,9 @@ namespace App\Tests\Admin\Action;
 
 use App\Admin\Action\DuplicateSetlist;
 use App\Admin\Action\DuplicateSetlistHandler;
-use App\Entity\SetListItem;
-use App\Entity\Setlist;
-use App\Entity\Sheet;
+use App\Entity\Setlist\Setlist;
+use App\Entity\Setlist\SetListItem;
+use App\Entity\Sheet\Sheet;
 use App\Repository\SetlistRepository;
 use PHPUnit\Framework\TestCase;
 

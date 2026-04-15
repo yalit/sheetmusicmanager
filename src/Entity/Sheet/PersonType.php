@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Sheet;
 
 use App\Repository\PersonTypeRepository;
 use Doctrine\ORM\Mapping as ORM;

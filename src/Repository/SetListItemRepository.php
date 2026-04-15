@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\SetListItem;
+use App\Entity\Setlist\SetListItem;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

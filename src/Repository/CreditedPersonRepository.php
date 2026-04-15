@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\CreditedPerson;
+use App\Entity\Sheet\CreditedPerson;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

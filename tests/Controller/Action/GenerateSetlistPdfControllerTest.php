@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\Action;
 
-use App\Entity\Member;
-use App\Entity\Setlist;
-use App\Enum\MemberRole;
+use App\Entity\Security\Member;
+use App\Entity\Setlist\Setlist;
+use App\Enum\Security\MemberRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
