@@ -2,7 +2,7 @@
 
 namespace App\Security;
 
-use App\Entity\Member;
+use App\Entity\Security\Member;
 use App\Repository\WebDavTokenRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
