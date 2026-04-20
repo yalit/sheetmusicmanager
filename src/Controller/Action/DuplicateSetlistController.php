@@ -4,7 +4,7 @@ namespace App\Controller\Action;
 
 use App\Admin\Action\DuplicateSetlist;
 use App\Admin\Action\DuplicateSetlistHandler;
-use App\Entity\Setlist;
+use App\Entity\Setlist\Setlist;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity\Factory;
+namespace App\Entity\Setlist\Factory;
 
-use App\Entity\SetListItem;
+use App\Entity\Setlist\SetListItem;
 
 class SetlistItemFactory
 {

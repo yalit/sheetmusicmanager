@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\ValueObject;
+namespace App\Entity\Sheet\ValueObject;
 
 class StoredFile
 {

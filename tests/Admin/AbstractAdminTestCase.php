@@ -3,14 +3,13 @@
 namespace App\Tests\Admin;
 
 use App\Controller\Admin\DashboardController;
-use App\Entity\Member;
-use App\Entity\Person;
-use App\Entity\PersonType;
-use App\Entity\Setlist;
-use App\Entity\Sheet;
-use App\Enum\MemberRole;
+use App\Entity\Security\Member;
+use App\Entity\Setlist\Setlist;
+use App\Entity\Sheet\Person;
+use App\Entity\Sheet\PersonType;
+use App\Entity\Sheet\Sheet;
+use App\Enum\Security\MemberRole;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Test\AbstractCrudTestCase;
 use EasyCorp\Bundle\EasyAdminBundle\Test\Trait\CrudTestFormAsserts;
 use EasyCorp\Bundle\EasyAdminBundle\Test\Trait\CrudTestIndexAsserts;

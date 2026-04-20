@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Sheet;
 
 use App\Doctrine\ValueObjectArray;
-use App\Entity\ValueObject\StoredFile;
+use App\Entity\Setlist\SetListItem;
+use App\Entity\Sheet\ValueObject\StoredFile;
 use App\Repository\SheetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

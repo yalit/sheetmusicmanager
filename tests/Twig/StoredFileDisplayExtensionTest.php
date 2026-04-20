@@ -2,7 +2,7 @@
 
 namespace App\Tests\Twig;
 
-use App\Entity\ValueObject\StoredFile;
+use App\Entity\Sheet\ValueObject\StoredFile;
 use App\Storage\StoredFileStorage;
 use App\Twig\StoredFileDisplayExtension;
 use PHPUnit\Framework\TestCase;

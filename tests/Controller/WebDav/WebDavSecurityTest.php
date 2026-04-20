@@ -3,21 +3,15 @@
 namespace App\Tests\Controller\WebDav;
 
 use App\DataFixtures\WebDavTokenFixtures;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class WebDavSecurityTest extends WebTestCase
 {
-    private const DAV_URL = '/dav/';
+    private const DAV_URL = '/dav/sheets/_Untagged/Untagged.pdf';
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
-
-    private function em(): EntityManagerInterface
-    {
-        return static::getContainer()->get(EntityManagerInterface::class);
-    }
 
     private function requestDav(string $email, string $plainToken): int
     {
@@ -76,14 +70,14 @@ final class WebDavSecurityTest extends WebTestCase
 
     public function testValidLibrarianTokenIsAccepted(): void
     {
-        $status = $this->requestDav('librarian@sheetmusic.test', 'librarian-plain-webdav-token');
+        $status = $this->requestDav('librarian@sheetmusic.test', WebDavTokenFixtures::LIBRARIAN_PLAIN_TOKEN);
 
         static::assertSame(200, $status);
     }
 
     public function testValidContributorTokenIsAccepted(): void
     {
-        $status = $this->requestDav('contributor@sheetmusic.test', 'contributor-plain-webdav-token');
+        $status = $this->requestDav('contributor@sheetmusic.test', WebDavTokenFixtures::CONTRIBUTOR_PLAIN_TOKEN);
 
         static::assertSame(200, $status);
     }

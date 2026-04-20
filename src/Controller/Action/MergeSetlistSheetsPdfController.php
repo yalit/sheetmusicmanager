@@ -2,14 +2,13 @@
 
 namespace App\Controller\Action;
 
-use App\Entity\Setlist;
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
+use App\Entity\Setlist\Setlist;
 use App\Storage\StoredFileStorage;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class MergeSetlistSheetsPdfController extends AbstractController
 {

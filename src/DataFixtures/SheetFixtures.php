@@ -2,11 +2,11 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\CreditedPerson;
-use App\Entity\Person;
-use App\Entity\PersonType;
-use App\Entity\Sheet;
-use App\Entity\ValueObject\StoredFile;
+use App\Entity\Sheet\CreditedPerson;
+use App\Entity\Sheet\Person;
+use App\Entity\Sheet\PersonType;
+use App\Entity\Sheet\Sheet;
+use App\Entity\Sheet\ValueObject\StoredFile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -28,6 +28,7 @@ class SheetFixtures extends Fixture implements DependentFixtureInterface
     public const SHEET_13_REF = 'sheet-13';
     public const SHEET_14_REF = 'sheet-14';
     public const MISSING_FILE_REF = 'missing_file';
+    public const UNTAGGED_FILE_REF  = 'untagged_file';
 
     // Existing entries must stay at indexes 0 and 1 — tests depend on SHEETS[0][0] and SHEETS[1][0]
     public const SHEETS = [
@@ -43,9 +44,10 @@ class SheetFixtures extends Fixture implements DependentFixtureInterface
         ['Cantique de Jean Racine',      ['Op11'],    ['choir', 'romantic', 'sacred'],   self::SHEET_10_REF],
         ['Pavane',                       ['Op50'],    ['orchestra', 'romantic'],         self::SHEET_11_REF],
         ['Nocturne in E flat Major',     ['Op9-2'],   ['piano', 'romantic'],             self::SHEET_12_REF],
-        ['Liebestraum No. 3',            [],          ['piano', 'romantic'],             self::SHEET_13_REF],
+        ['Liebestraum No. 3',            ['K543', 'J345'],          ['piano', 'romantic'],             self::SHEET_13_REF],
         ['Boléro',                       [],          ['orchestra', 'modern'],           self::SHEET_14_REF],
-        ['No file on the drive',         [],          [],           self::MISSING_FILE_REF],
+        ['No file on the drive',         [],          ['piano', 'unique_tag'],           self::MISSING_FILE_REF],
+        ['Untagged',         [],          [],           self::UNTAGGED_FILE_REF],
     ];
 
     // [sheetRef, composerPersonRef, arrangerPersonRef|null, notes]
@@ -65,6 +67,7 @@ class SheetFixtures extends Fixture implements DependentFixtureInterface
         self::SHEET_13_REF => [PersonFixtures::LISZT_REF,      null,                       null],
         self::SHEET_14_REF => [PersonFixtures::RAVEL_REF,      null,                       null],
         self::MISSING_FILE_REF => [null, null, null],
+        self::UNTAGGED_FILE_REF => [null, null, null],
     ];
 
     public function getDependencies(): array

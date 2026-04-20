@@ -3,10 +3,10 @@
 namespace App\Tests\Controller\Action;
 
 use App\DataFixtures\SheetFixtures;
-use App\Entity\Member;
-use App\Entity\Setlist;
-use App\Entity\Sheet;
-use App\Enum\MemberRole;
+use App\Entity\Security\Member;
+use App\Entity\Setlist\Setlist;
+use App\Entity\Sheet\Sheet;
+use App\Enum\Security\MemberRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

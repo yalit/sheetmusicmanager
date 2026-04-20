@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Setlist;
 
 use App\Repository\SetlistRepository;
 use Doctrine\Common\Collections\ArrayCollection;

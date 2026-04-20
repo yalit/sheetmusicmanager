@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\Security;
+namespace App\Service\Security;
 
-use App\Entity\Member;
+use App\Entity\Security\Member;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;

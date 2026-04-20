@@ -3,7 +3,7 @@
 namespace App\Admin\Fields;
 
 use App\Admin\Type\SheetFileType;
-use App\Entity\ValueObject\StoredFile;
+use App\Entity\Sheet\ValueObject\StoredFile;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
 use Symfony\Contracts\Translation\TranslatableInterface;

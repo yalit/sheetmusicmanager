@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Entity\Factory;
+namespace App\Entity\Setlist\Factory;
 
-use App\Entity\Setlist;
-use Doctrine\Common\Collections\ArrayCollection;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use App\Entity\Setlist\Setlist;
 
 class SetlistFactory
 {

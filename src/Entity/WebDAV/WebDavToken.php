@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\WebDAV;
 
+use App\Entity\Security\Member;
 use App\Repository\WebDavTokenRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\Blameable;

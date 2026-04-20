@@ -7,7 +7,7 @@ security:
     providers:
         app_user_provider:
             entity:
-                class: App\Entity\Member
+                class: App\Entity\Security\Member
                 property: email
 
     role_hierarchy:

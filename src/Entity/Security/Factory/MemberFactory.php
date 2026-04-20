@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Entity\Factory;
+namespace App\Entity\Security\Factory;
 
-use App\Entity\Member;
-use App\Enum\MemberRole;
+use App\Entity\Security\Member;
+use App\Enum\Security\MemberRole;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class MemberFactory

@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Setlist;
+use App\Entity\Setlist\Setlist;
 use App\Form\DataTransformer\SheetToStringDataTransformer;
 use App\Message\AddSheetsToSetlist;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

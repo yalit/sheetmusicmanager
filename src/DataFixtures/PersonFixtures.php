@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Person;
+use App\Entity\Sheet\Person;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 

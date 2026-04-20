@@ -6,7 +6,7 @@ use App\Admin\Action\DuplicateSetlistAction;
 use App\Admin\Action\GenerateSetlistPdfAction;
 use App\Admin\Action\MergeSetlistSheetsPdfAction;
 use App\Admin\Fields\CollectionTableField;
-use App\Entity\Setlist;
+use App\Entity\Setlist\Setlist;
 use App\Security\Voter\SetlistVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;

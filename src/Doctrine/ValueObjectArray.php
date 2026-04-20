@@ -2,8 +2,8 @@
 
 namespace App\Doctrine;
 
+use App\Entity\Sheet\ValueObject\StoredFile;
 use App\Entity\ToArray;
-use App\Entity\ValueObject\StoredFile;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Exception\SerializationFailed;
 use Doctrine\DBAL\Types\Exception\ValueNotConvertible;

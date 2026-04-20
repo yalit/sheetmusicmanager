@@ -2,7 +2,7 @@
 
 namespace App\Form\DataTransformer;
 
-use App\Entity\Sheet;
+use App\Entity\Sheet\Sheet;
 use App\Repository\SheetRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 

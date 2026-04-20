@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Person;
+use App\Entity\Sheet\Person;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

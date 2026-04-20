@@ -2,8 +2,8 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Member;
-use App\Enum\MemberRole;
+use App\Entity\Security\Member;
+use App\Enum\Security\MemberRole;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;

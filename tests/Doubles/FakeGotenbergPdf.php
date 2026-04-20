@@ -93,7 +93,7 @@ final class FakeGotenbergBuilder implements BuilderInterface
     public function stream(): StreamedResponse
     {
         return new StreamedResponse(
-            static fn() => null,
+            static fn() => print('%PDF-1.4 fake merged pdf'),
             200,
             ['Content-Disposition' => sprintf('%s; filename="%s"', $this->disposition, $this->filename)],
         );

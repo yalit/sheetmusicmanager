@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\WebDavToken;
+use App\Entity\WebDAV\WebDavToken;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
