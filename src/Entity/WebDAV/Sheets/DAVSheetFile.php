@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Entity\WebDAV;
+namespace App\Entity\WebDAV\Sheets;
 
 use App\Entity\Sheet\Sheet;
 use App\Service\DataProviders\DataProvider;
-use App\Service\WebDAV\StringSanitizer;
+use App\Service\WebDAV\NameGenerator;
 use Sabre\DAV\File;
 
 class DAVSheetFile extends File
@@ -12,12 +12,12 @@ class DAVSheetFile extends File
     public function __construct(
         private readonly Sheet                $sheet,
         private readonly DataProvider         $pdfProvider,
-        private readonly StringSanitizer $filenameService,
+        private readonly NameGenerator         $nameGenerator,
     ) {}
 
     public function getName(): string
     {
-        return $this->filenameService->sanitize($this->sheet->getTitle()).'.pdf';
+        return $this->nameGenerator->generate($this->sheet);
     }
 
     public function get(): string

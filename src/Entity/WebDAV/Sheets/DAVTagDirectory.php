@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity\WebDAV;
+namespace App\Entity\WebDAV\Sheets;
 
-use App\Entity\WebDAV\Factory\DAVSheetFileFactory;
+use App\Entity\WebDAV\Factory\Sheets\DAVSheetFileFactory;
 use App\Repository\SheetRepository;
 use Sabre\DAV\Collection;
 

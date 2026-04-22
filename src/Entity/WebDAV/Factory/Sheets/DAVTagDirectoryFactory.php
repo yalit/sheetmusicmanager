@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Entity\WebDAV\Factory;
+namespace App\Entity\WebDAV\Factory\Sheets;
 
-use App\Entity\WebDAV\DAVTagDirectory;
+use App\Entity\WebDAV\Sheets\DAVTagDirectory;
 use App\Repository\SheetRepository;
-use App\Service\SheetPdfProvider;
-use App\Service\WebDAV\StringSanitizer;
 
 final readonly class DAVTagDirectoryFactory
 {
