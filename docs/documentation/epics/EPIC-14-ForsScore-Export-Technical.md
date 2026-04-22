@@ -57,12 +57,12 @@ A second branch of the WebDAV tree exposes setlists as folders, each containing 
 - Each setlist is represented as a virtual directory named after the setlist
 - Each entry within a setlist directory is a virtual file node with a filename prefixed by its position in the setlist (e.g. `01 - Title.pdf`, `02 - Title.pdf`) to preserve order when viewed in iOS Files
 - The virtual files point to the same underlying PDF as the sheet library — no duplication on disk
-- A centralised `ForScoreFilenameGenerator` service is responsible for all filename generation logic, shared between this virtual tree and the .4SS exporter (TUS-04), ensuring filenames are always consistent between the two
+- A centralised `SetlistFilenameGenerator` service is responsible for all filename generation logic, shared between this virtual tree and the .4SS exporter (TUS-04), ensuring filenames are always consistent between the two
 - The tree is read-only — setlist management stays in the web app
 
 **Entities / Concepts Used:**
 - Existing `Setlist`, `SetlistEntry`, `Sheet` entities are the data source
-- `ForScoreFilenameGenerator` service introduced and shared with TUS-04
+- `SetlistFilenameGenerator` service introduced and shared with TUS-04
 
 ---
 
@@ -74,7 +74,7 @@ A new export endpoint generates a `.4SS` file on the fly for a given setlist and
 **Key Decisions:**
 - A new Symfony route is added for each setlist: `GET /setlists/{id}/export/forscore`
 - A `ForScoreExporter` service generates the `.4SS` XML structure from the setlist's entries
-- Filenames in the generated XML are produced by the same `ForScoreFilenameGenerator` service used in TUS-03, guaranteeing that the filenames in the `.4SS` match exactly what was downloaded via WebDAV
+- Filenames in the generated XML are produced by the same `SetlistFilenameGenerator` service used in TUS-03, guaranteeing that the filenames in the `.4SS` match exactly what was downloaded via WebDAV
 - The response is served with the appropriate content-disposition header to trigger a file download
 - If a sheet in the setlist has no associated PDF file, it is exported as a `placeholder` element rather than a `score` element, so forScore still creates the setlist entry without breaking the import
 - Access to the export endpoint is restricted to authenticated users who own the setlist
@@ -82,7 +82,7 @@ A new export endpoint generates a `.4SS` file on the fly for a given setlist and
 **Entities / Concepts Used:**
 - Existing `Setlist`, `SetlistEntry`, `Sheet` entities
 - `ForScoreExporter` service introduced
-- `ForScoreFilenameGenerator` service shared with TUS-03
+- `SetlistFilenameGenerator` service shared with TUS-03
 
 ---
 
