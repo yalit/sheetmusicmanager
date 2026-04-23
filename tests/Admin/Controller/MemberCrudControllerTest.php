@@ -131,10 +131,10 @@ final class MemberCrudControllerTest extends AbstractAdminTestCase
     public static function getMemberRolesRightsForDetail(): iterable
     {
         return [
-            'Admin can view member detail'        => [MemberRole::Admin,       true],
-            'Librarian cannot view member detail' => [MemberRole::Librarian,   false],
-            'Contributor cannot view member detail' => [MemberRole::Contributor, false],
-            'Member cannot view member detail'    => [MemberRole::Member,      false],
+            'Admin can view any member detail'            => [MemberRole::Admin,       true],
+            'Librarian cannot view another member detail' => [MemberRole::Librarian,   false],
+            'Contributor cannot view another member detail' => [MemberRole::Contributor, false],
+            'Member can view own detail'                  => [MemberRole::Member,      true],
         ];
     }
 
@@ -150,6 +150,28 @@ final class MemberCrudControllerTest extends AbstractAdminTestCase
         } else {
             static::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
         }
+    }
+
+    /**
+     * @return iterable<string, array{MemberRole}>
+     */
+    public static function getAllMemberRoles(): iterable
+    {
+        return [
+            'Admin can view own detail'       => [MemberRole::Admin],
+            'Librarian can view own detail'   => [MemberRole::Librarian],
+            'Contributor can view own detail' => [MemberRole::Contributor],
+            'Member can view own detail'      => [MemberRole::Member],
+        ];
+    }
+
+    #[DataProvider('getAllMemberRoles')]
+    public function testDetailOwnAccess(MemberRole $role): void
+    {
+        $member = $this->getMember($role);
+        $this->loginAs($role);
+        $this->client->request('GET', $this->generateDetailUrl($member->getId()));
+        static::assertResponseIsSuccessful();
     }
 
     /**
