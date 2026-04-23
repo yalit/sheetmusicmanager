@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Admin\Action\DuplicateSetlistAction;
+use App\Admin\Action\ExportSetlistToForScoreAction;
 use App\Admin\Action\GenerateSetlistPdfAction;
 use App\Admin\Action\MergeSetlistSheetsPdfAction;
 use App\Admin\Fields\CollectionTableField;
@@ -48,11 +49,14 @@ class SetlistCrudController extends AbstractCrudController
             ->add(Crud::PAGE_DETAIL, GenerateSetlistPdfAction::new())
             ->add(Crud::PAGE_INDEX, MergeSetlistSheetsPdfAction::new())
             ->add(Crud::PAGE_DETAIL, MergeSetlistSheetsPdfAction::new())
-            ->setPermission(Action::INDEX,  SetlistVoter::INDEX)
-            ->setPermission(Action::DETAIL, SetlistVoter::DETAIL)
-            ->setPermission(Action::NEW,    SetlistVoter::NEW)
-            ->setPermission(Action::EDIT,   SetlistVoter::EDIT)
-            ->setPermission(Action::DELETE, SetlistVoter::DELETE)
+            ->add(Crud::PAGE_INDEX, ExportSetlistToForScoreAction::new())
+            ->add(Crud::PAGE_DETAIL, ExportSetlistToForScoreAction::new())
+            ->setPermission(Action::INDEX,        SetlistVoter::INDEX)
+            ->setPermission(Action::DETAIL,       SetlistVoter::DETAIL)
+            ->setPermission(Action::NEW,          SetlistVoter::NEW)
+            ->setPermission(Action::EDIT,         SetlistVoter::EDIT)
+            ->setPermission(Action::DELETE,       SetlistVoter::DELETE)
+            ->setPermission(ExportSetlistToForScoreAction::NAME,     SetlistVoter::EXPORT_FORSCORE)
         ;
     }
 
