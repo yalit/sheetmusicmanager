@@ -7,6 +7,7 @@ use App\Enum\Security\MemberRole;
 use App\Security\Voter\MemberVoter;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use App\Admin\Fields\WebDavTokenField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -68,5 +69,9 @@ class MemberCrudController extends AbstractCrudController
             ->setFormTypeOptions(['choice_value' => fn(?MemberRole $r) => $r?->value])
             ->setRequired(false)
         ;
+
+        if ($pageName === Crud::PAGE_DETAIL) {
+            yield WebDavTokenField::new('webDavToken', 'WebDAV Token');
+        }
     }
 }

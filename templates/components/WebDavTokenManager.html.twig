@@ -1,0 +1,40 @@
+<div {{ attributes }}>
+    {% if this.plainToken is not null %}
+        <div data-plain-token>
+            <code>{{ this.plainToken }}</code>
+            <button
+                data-action="live#action"
+                data-live-action-param="dismiss"
+            >Dismiss</button>
+        </div>
+    {% endif %}
+
+    {% if this.member.webDavToken is null %}
+        <div data-no-token>
+            <label>
+                Days valid:
+                <input type="number" data-model="ttlDays" value="{{ this.ttlDays }}" min="1">
+            </label>
+            <button
+                data-action="live#action"
+                data-live-action-param="generate"
+            >Generate token</button>
+        </div>
+    {% else %}
+        <div data-token-expiry>
+            Expires: {{ this.member.webDavToken.expiresAt|date('Y-m-d') }}
+        </div>
+        <label>
+            Days valid:
+            <input type="number" data-model="ttlDays" value="{{ this.ttlDays }}" min="1">
+        </label>
+        <button
+            data-action="live#action"
+            data-live-action-param="renew"
+        >Renew</button>
+        <button
+            data-action="live#action"
+            data-live-action-param="revoke"
+        >Revoke</button>
+    {% endif %}
+</div>

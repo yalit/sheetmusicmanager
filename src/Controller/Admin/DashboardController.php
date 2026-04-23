@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -26,6 +28,17 @@ class DashboardController extends AbstractDashboardController
         ;
     }
 
+    public function configureActions(): Actions
+    {
+         $actions = parent::configureActions();
+
+         $actions
+             ->add(Action::INDEX, Action::DETAIL)
+         ;
+
+         return $actions;
+    }
+
     public function configureCrud(): Crud
     {
         $crud = parent::configureCrud();
@@ -34,6 +47,7 @@ class DashboardController extends AbstractDashboardController
             ->setFormThemes(['admin/form.html.twig', '@EasyAdmin/crud/form_theme.html.twig'])
             ->renderContentMaximized()
             ->setPaginatorPageSize(25)
+            ->setDefaultRowAction(Action::DETAIL)
         ;
     }
 
