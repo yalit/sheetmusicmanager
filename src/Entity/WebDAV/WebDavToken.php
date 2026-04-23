@@ -17,12 +17,14 @@ class WebDavToken
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'webDavToken', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'webDavToken')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Member $member = null;
 
     #[ORM\Column(length: 255)]
     private ?string $hashedToken = null;
+
+    private ?string $plainToken = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $expiresAt = null;
@@ -66,5 +68,15 @@ class WebDavToken
         $this->expiresAt = $expiresAt;
 
         return $this;
+    }
+
+    public function getPlainToken(): ?string
+    {
+        return $this->plainToken;
+    }
+
+    public function setPlainToken(?string $plainToken): void
+    {
+        $this->plainToken = $plainToken;
     }
 }
