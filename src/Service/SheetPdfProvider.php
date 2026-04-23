@@ -18,13 +18,24 @@ readonly class SheetPdfProvider implements DataProvider
         private GotenbergPdfInterface $gotenberg,
     ) {}
 
+    public function hasContent($data): bool
+    {
+        foreach ($data->getFiles() as $file) {
+            if (file_exists($this->storage->absolutePath($file))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Returns the PDF content for a sheet as a binary string.
      *
      * - 1 file  : served directly from disk
      * - N files : merged via Gotenberg (same merge as the setlist action)
      *
-     *@throws NotFound when no PDF file exists on disk
+     * @throws NotFound when no PDF file exists on disk
      */
     public function getContent($data): string
     {

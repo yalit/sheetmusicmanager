@@ -5,13 +5,13 @@ namespace App\Entity\WebDAV\Factory\Setlist;
 use App\Entity\Setlist\SetListItem;
 use App\Entity\WebDAV\Setlist\DAVSetlistFile;
 use App\Service\SheetPdfProvider;
-use App\Service\WebDAV\SetlistFilenameGenerator;
+use App\Service\WebDAV\SheetFilenameGenerator;
 
 final readonly class DAVSetlistFileFactory
 {
     public function __construct(
         private SheetPdfProvider          $provider,
-        private SetlistFilenameGenerator $filenameGenerator,
+        private SheetFilenameGenerator $filenameGenerator,
     ) {}
 
     public function new(SetListItem $item): DAVSetlistFile

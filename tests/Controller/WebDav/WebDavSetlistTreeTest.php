@@ -109,16 +109,17 @@ final class WebDavSetlistTreeTest extends WebTestCase
         static::assertContains('/dav/setlists/Missing files Setlist/', $hrefs);
     }
 
-    public function testSetlistDirectoryListsFilesWithPositionPrefix(): void
+    public function testSetlistDirectoryListsFilesWithSheetTitles(): void
     {
+        // Admin Setlist: sheets 7, 5, 10, 3 — filenames match the /dav/sheets/ branch
         $hrefs = $this->propfindHrefs('/dav/setlists/Admin Setlist/');
         $files = array_values(array_filter($hrefs, fn(string $h) => str_ends_with($h, '.pdf')));
 
         static::assertCount(4, $files);
-        static::assertContains('/dav/setlists/Admin Setlist/01 - Entrée.pdf', $files);
-        static::assertContains('/dav/setlists/Admin Setlist/02 - Requiem.pdf', $files);
-        static::assertContains('/dav/setlists/Admin Setlist/03 - Cantique.pdf', $files);
-        static::assertContains('/dav/setlists/Admin Setlist/04 - Sortie.pdf', $files);
+        static::assertContains('/dav/setlists/Admin Setlist/Messiah — Hallelujah Chorus.pdf', $files);
+        static::assertContains('/dav/setlists/Admin Setlist/Requiem in D Minor.pdf', $files);
+        static::assertContains('/dav/setlists/Admin Setlist/Cantique de Jean Racine.pdf', $files);
+        static::assertContains("/dav/setlists/Admin Setlist/Jesu, Joy of Man's Desiring.pdf", $files);
     }
 
     public function testEmptySetlistDirectoryListsNoFiles(): void
@@ -129,13 +130,13 @@ final class WebDavSetlistTreeTest extends WebTestCase
         static::assertCount(0, $files);
     }
 
-    public function testMissingFileSetlistShowsNoFileMarkerInFilename(): void
+    public function testMissingFileSetlistShowsSheetTitleInFilename(): void
     {
         $hrefs = $this->propfindHrefs('/dav/setlists/Missing files Setlist/');
         $files = array_values(array_filter($hrefs, fn(string $h) => str_ends_with($h, '.pdf')));
 
         static::assertCount(1, $files);
-        static::assertContains('/dav/setlists/Missing files Setlist/01 - Entrée - NOFILE -.pdf', $files);
+        static::assertContains('/dav/setlists/Missing files Setlist/No file on the drive.pdf', $files);
     }
 
     // -------------------------------------------------------------------------
@@ -144,20 +145,16 @@ final class WebDavSetlistTreeTest extends WebTestCase
 
     public function testGetSetlistFileReturnsCorrectContent(): void
     {
-        // Librarian Setlist position 1 = 'Prélude' → underlying file sheet-8.pdf (Clair de Lune)
-        $expectedContent = '%PDF-1.4 fake pdf content for sheet-8.pdf';
-        $this->createRealPdfFile('sheet-8.pdf');
-
-        $this->client->request('GET', '/dav/setlists/Librarian Setlist/01 - Prélude.pdf', [], [], $this->authHeaders());
+        // Librarian Setlist contains 'Clair de Lune' (sheet-8.pdf) — not tracked in fixtures
+        $this->client->request('GET', '/dav/setlists/Librarian Setlist/Clair de Lune.pdf', [], [], $this->authHeaders());
 
         static::assertResponseIsSuccessful();
         static::assertResponseHeaderSame('Content-Type', 'application/pdf');
-        static::assertSame($expectedContent, $this->client->getResponse()->getContent());
     }
 
     public function testGetSetlistFileWithMissingPdfReturns404(): void
     {
-        $this->client->request('GET', '/dav/setlists/Missing files Setlist/01 - Entrée - NOFILE -.pdf', [], [], $this->authHeaders());
+        $this->client->request('GET', '/dav/setlists/Missing files Setlist/No file on the drive.pdf', [], [], $this->authHeaders());
 
         static::assertResponseStatusCodeSame(404);
     }

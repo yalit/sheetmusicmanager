@@ -16,4 +16,9 @@ interface DataProvider
      * @param D $data
      */
     public function getSize($data): ?int;
+
+    /**
+     * @param D $data
+     */
+    public function hasContent($data): bool;
 }

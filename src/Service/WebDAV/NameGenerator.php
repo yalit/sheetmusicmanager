@@ -7,5 +7,5 @@ namespace App\Service\WebDAV;
  */
 interface NameGenerator
 {
-    public function generate(T $data): string;
+    public function generate(mixed $data): string;
 }

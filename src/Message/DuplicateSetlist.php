@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Action;
+namespace App\Message;
 
 use App\Entity\Setlist\Setlist;
 
