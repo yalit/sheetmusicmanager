@@ -71,4 +71,19 @@ final class MemberVoterTest extends WebTestCase
 
         static::assertResponseIsSuccessful();
     }
+
+    // -------------------------------------------------------------------------
+    // DETAIL self-access does NOT extend to EDIT
+    // -------------------------------------------------------------------------
+
+    public function testMemberCannotEditTheirOwnProfile(): void
+    {
+        $member = $this->getMember(MemberRole::Member);
+        $this->client->loginUser($member);
+
+        $url = static::getContainer()->get('router')->generate('admin_member_edit', ['entityId' => $member->getId()]);
+        $this->client->request('GET', $url);
+
+        static::assertResponseStatusCodeSame(403);
+    }
 }
