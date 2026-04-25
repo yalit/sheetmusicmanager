@@ -58,6 +58,11 @@ class WebDavToken
         return $this;
     }
 
+    public function isExpired(): bool
+    {
+        return $this->expiresAt < new \DateTimeImmutable();
+    }
+
     public function getExpiresAt(): ?\DateTimeImmutable
     {
         return $this->expiresAt;

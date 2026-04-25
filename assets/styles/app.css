@@ -110,3 +110,40 @@
         text-decoration: underline;
     }
 }
+
+
+.webdav-token {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .webdav-token-information {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .webdav-ttl-input {
+        width: 100px;
+    }
+
+    .btn:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .webdav-plain-token {
+        border: #ddd 1px solid;
+        border-radius: 5px;
+        width: fit-content;
+        button {
+            border-right: 1px solid #ddd;
+            border-radius: 0;
+            margin: 0;
+        }
+        code {
+            padding: 0 10px;
+            color: #5f6251;
+        }
+    }
+}
