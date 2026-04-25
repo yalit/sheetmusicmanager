@@ -93,11 +93,19 @@ class SetlistCrudController extends AbstractCrudController
         yield IdField::new('id')->hideOnForm();
         yield TextField::new('title', 'Title');
         yield DateField::new('date', 'Date');
-        yield CollectionTableField::new('items', 'Items')
-            ->useEntryCrudForm(SetlistItemCrudController::class)
-            ->allowAdd()
-            ->allowDelete()
-            ->setFormTypeOption('allow_sort', true)
-        ;
+        $items = CollectionTableField::new('items', 'Items');
+
+        if ($pageName === Crud::PAGE_DETAIL) {
+            $items->setTemplatePath('admin/fields/setlist_items.html.twig');
+        } else {
+            $items
+                ->useEntryCrudForm(SetlistItemCrudController::class)
+                ->allowAdd()
+                ->allowDelete()
+                ->setFormTypeOption('allow_sort', true)
+            ;
+        }
+
+        yield $items;
     }
 }

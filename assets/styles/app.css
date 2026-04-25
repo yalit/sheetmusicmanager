@@ -1,3 +1,19 @@
+.setlist-items-detail {
+    th {
+        font-weight: 600;
+        font-size: 0.8em;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6c757d;
+        white-space: nowrap;
+    }
+
+    td:first-child {
+        width: 32px;
+        padding-right: 0;
+    }
+}
+
 /* Generic table collection */
 .table-collection {
     width: 100%;
@@ -108,5 +124,96 @@
 
     .loaded_file__link:hover {
         text-decoration: underline;
+    }
+}
+
+
+.webdav-token {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .webdav-divider {
+        margin: 0;
+        border-color: #dee2e6;
+    }
+
+    summary {
+        cursor: pointer;
+        color: #6c757d;
+        user-select: none;
+
+        &:hover {
+            color: #495057;
+        }
+    }
+
+    .webdav-connection-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .webdav-connection-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-left: 0.5em;
+
+            .webdav-connection-label {
+                font-size: 0.8em;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: #6c757d;
+                min-width: 70px;
+            }
+
+            .webdav-connection-value {
+                font-size: 0.85em;
+                flex-grow: 1;
+            }
+        }
+    }
+
+    .webdav-instructions {
+        ol {
+            margin: 8px 0 0 0;
+            padding-left: 1.5em;
+            color: #495057;
+
+            li + li {
+                margin-top: 4px;
+            }
+        }
+    }
+
+    .webdav-token-information {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .webdav-ttl-input {
+        width: 100px;
+    }
+
+    .btn:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .webdav-plain-token {
+        border: #ddd 1px solid;
+        border-radius: 5px;
+        width: fit-content;
+        button {
+            border-right: 1px solid #ddd;
+            border-radius: 0;
+            margin: 0;
+        }
+        code {
+            padding: 0 10px;
+            color: #5f6251;
+        }
     }
 }

@@ -3,11 +3,11 @@
 namespace App\Doctrine;
 
 use App\Entity\Sheet\ValueObject\StoredFile;
-use App\Entity\ToArray;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Exception\SerializationFailed;
 use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 class ValueObjectArray extends Type
@@ -21,7 +21,7 @@ class ValueObjectArray extends Type
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return self::VALUE_OBJECT_ARRAY;
+        return Types::JSON;
     }
 
     /**

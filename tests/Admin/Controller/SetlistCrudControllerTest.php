@@ -3,6 +3,7 @@
 namespace App\Tests\Admin\Controller;
 
 use App\Controller\Admin\SetlistCrudController;
+use App\Entity\Setlist\Setlist;
 use App\Enum\Security\MemberRole;
 use App\Tests\Admin\AbstractAdminTestCase;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -165,6 +166,59 @@ final class SetlistCrudControllerTest extends AbstractAdminTestCase
             'Librarian can delete any setlist'    => [MemberRole::Librarian,   MemberRole::Member,    true,  true],
             'Admin can delete any setlist'        => [MemberRole::Admin,       MemberRole::Member,    true,  true],
         ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Detail page — items display
+    // -------------------------------------------------------------------------
+
+    public function testDetailPageRendersOneRowPerItem(): void
+    {
+        $setlist = $this->getSetlist(MemberRole::Member);
+        $this->loginAs(MemberRole::Member);
+        $crawler = $this->client->request('GET', $this->generateDetailUrl($setlist->getId()));
+
+        static::assertResponseIsSuccessful();
+        static::assertCount(3, $crawler->filter('.setlist-items-detail tbody tr'));
+    }
+
+    public function testDetailPageShowsItemNamesAndSheets(): void
+    {
+        $setlist = $this->getSetlist(MemberRole::Member);
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->generateDetailUrl($setlist->getId()));
+
+        $content = (string) $this->client->getResponse()->getContent();
+        static::assertStringContainsString('Processional', $content);
+        static::assertStringContainsString('Offertory', $content);
+        static::assertStringContainsString('Closing Hymn', $content);
+        static::assertStringContainsString('Toccata and Fugue in D Minor', $content);
+        static::assertStringContainsString("Jesu, Joy", $content);
+        static::assertStringContainsString('Messiah', $content);
+    }
+
+    public function testDetailPageShowsDashForEmptySetlist(): void
+    {
+        $setlist = $this->em()->getRepository(Setlist::class)->findOneBy(['title' => 'Empty Setlist']);
+        static::assertNotNull($setlist);
+
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->generateDetailUrl($setlist->getId()));
+
+        static::assertResponseIsSuccessful();
+        static::assertSelectorNotExists('.setlist-items-detail');
+        static::assertStringContainsString('—', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testEditFormUsesCollectionWidgetNotDisplayTable(): void
+    {
+        $setlist = $this->getSetlist(MemberRole::Member);
+        $this->loginAs(MemberRole::Member);
+        $this->client->request('GET', $this->generateEditFormUrl($setlist->getId()));
+
+        static::assertResponseIsSuccessful();
+        static::assertSelectorNotExists('.setlist-items-detail');
+        static::assertSelectorExists('[data-collection-table-allow-sort-value]');
     }
 
     public function testEditFormHasSortableAttributeOnItemsWidget(): void

@@ -1,0 +1,18 @@
+{# @var action \EasyCorp\Bundle\EasyAdminBundle\Dto\ActionDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+
+{% set ua = app.request.headers.get('User-Agent', '') %}
+{% set is_ios = 'iPad' in ua or 'iPhone' in ua %}
+
+<a href="{{ action.linkUrl }}"
+   role="button"
+   class="btn btn-secondary {{ action.cssClass }}"
+   {% if not is_ios %}
+       title="For use with forScore on iPad"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+   {% endif %}
+>
+    <i class="{{ action.icon }} btn-icon"></i>
+    <span class="action-label">{{ action.label|trans }}</span>
+</a>

@@ -44,6 +44,8 @@ tasks:
         vars:
             ENV: '{{ default "dev" .ENV}}'
         cmds:
+            - "{{.CONSOLE}} d:d:d --force --if-exists --env={{.ENV}}"
+            - "{{.CONSOLE}} d:d:c --env={{.ENV}}"
             - "{{.CONSOLE}} doctrine:migrations:migrate --no-interaction --env={{.ENV}}"
             - "{{.CONSOLE}} doctrine:fixtures:load --no-interaction --env={{.ENV}}"
 
@@ -52,8 +54,9 @@ tasks:
         desc: Init test environment
         cmds:
             - rm -f var/data_test.db
-            - task: setup-db
-              vars: {ENV: 'test'}
+            - "{{.CONSOLE}} d:d:d --force --env=test"
+            - "{{.CONSOLE}} d:s:u --force --env=test"
+            - "{{.CONSOLE}} doctrine:fixtures:load --no-interaction --env=test"
 
     tests:
         desc: Run tests
@@ -71,10 +74,10 @@ tasks:
     reset:
         desc: Drop and recreate the database, then reload fixtures
         cmds:
-            - rm -f var/data_dev.db
             - task: setup-db
               vars: {ENV: 'dev'}
             - task: copy-testfiles
+            - task: test-init
 
     copy-testfiles:
         desc: copy all the sheets test files from the tests to the public

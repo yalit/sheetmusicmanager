@@ -13,6 +13,7 @@ final class ExportSetlistToForScoreAction
         return Action::new(ExportSetlistToForScoreAction::NAME, 'Export to forScore')
             ->setIcon('fa fa-music')
             ->renderAsLink()
-            ->linkToRoute('admin_export_setlist_forscore', fn(Setlist $s) => ['id' => $s->getId()]);
+            ->linkToRoute('admin_export_setlist_forscore', fn(Setlist $s) => ['id' => $s->getId()])
+            ->setTemplatePath('admin/action/export_forscore.html.twig');
     }
 }

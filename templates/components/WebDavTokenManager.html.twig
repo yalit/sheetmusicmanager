@@ -1,0 +1,171 @@
+<div class="webdav-token" {{ attributes }}>
+
+    {% if this.member.webDavToken is not null %}
+        {% set token = this.member.webDavToken %}
+        <div class="webdav-token-information">
+            <span class="webdav-token-status {% if token.expired %}text-danger{% else %}text-success{% endif %}">
+                {% if token.expired %}
+                    <i class="fa-solid fa-ban"></i>
+                {% else %}
+                    <i class="fa-regular fa-square-check"></i>
+                {% endif %}
+            </span>
+            <span
+                class="webdav-token-expiration-state {% if token.expired %}text-danger{% else %}text-success{% endif %}">
+                <i class="fa-regular fa-clock"></i>
+            </span>
+            <span
+                class="webdav-token-expiration-date {% if token.expired %}text-danger{% endif %}">{{ token.expiresAt | date("d-m-Y") }}</span>
+        </div>
+    {% endif %}
+
+
+    {# ── Plain token banner (shown once after generate / renew) ──────────── #}
+    {% if this.plainToken is not null %}
+        <div class="webdav-plain-token" data-plain-token>
+            <button class="btn btn-light"
+                    data-action="live#action"
+                    data-live-action-param="dismiss"
+            ><i class="fa-solid fa-eye-slash"></i></button>
+            <button class="btn btn-light"
+                    data-controller="clipboard"
+                    data-clipboard-text-value="{{ this.plainToken }}"
+                    data-action="clipboard#copy"
+            ><i class="fa-regular fa-copy"></i>
+            </button>
+            <code>{{ this.plainToken }}</code>
+        </div>
+    {% endif %}
+
+    {# ── Actions row ──────────────────────────────────────────────────────── #}
+    <div class="webdav-token-actions">
+        {% if this.member.webDavToken is null %}
+            <button class="btn btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#webdav-token-new-modal">Generate token
+            </button>
+        {% else %}
+            <button class="btn btn-secondary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#webdav-token-renew-modal">Renew
+            </button>
+            <button class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#webdav-token-revoke-modal">Revoke
+            </button>
+        {% endif %}
+    </div>
+
+    {# ── Connection info ──────────────────────────────────────────────────── #}
+    <details class="webdav-connection-info">
+        <summary>WebDAV Connection info</summary>
+        <div class="webdav-connection-row">
+            <span class="webdav-connection-label">Server</span>
+            <code class="webdav-connection-value">{{ this.davUrl }}</code>
+            <button class="btn btn-light"
+                    data-controller="clipboard"
+                    data-clipboard-text-value="{{ this.davUrl }}"
+                    data-action="clipboard#copy"><i class="fa-regular fa-copy"></i></button>
+        </div>
+        <div class="webdav-connection-row">
+            <span class="webdav-connection-label">Username</span>
+            <code class="webdav-connection-value">{{ this.member.email }}</code>
+            <button class="btn btn-light"
+                    data-controller="clipboard"
+                    data-clipboard-text-value="{{ this.member.email }}"
+                    data-action="clipboard#copy"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </details>
+
+    {# ── iOS Files setup instructions ─────────────────────────────────────── #}
+    <details class="webdav-instructions">
+        <summary>How to connect in iOS Files</summary>
+        <ol>
+            <li>Open the <strong>Files</strong> app on your iPad or iPhone.</li>
+            <li>Tap <strong>Browse</strong> at the bottom, then tap <strong>…</strong> in the top-right and choose <strong>Connect to Server</strong>.</li>
+            <li>Enter the server URL above and tap <strong>Connect</strong>.</li>
+            <li>Select <strong>Registered User</strong>, enter your username and the access password (token above), then tap <strong>Next</strong>.</li>
+            <li>The server will appear under <strong>Locations</strong> in the Files sidebar.</li>
+        </ol>
+    </details>
+
+    {# ── Generate modal ───────────────────────────────────────────────────── #}
+    {# data-live-ignore: prevent morphdom from touching this while Bootstrap controls its state #}
+    <div class="modal fade" id="webdav-token-new-modal" tabindex="-1" aria-hidden="true" data-live-ignore>
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate WebDAV token</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="text-muted small text-nowrap mb-0">Valid for</label>
+                        <input type="number" class="form-control form-control-sm webdav-ttl-input"
+                               data-model="ttlDays" value="{{ this.ttlDays }}" min="1">
+                        <span class="text-muted small text-nowrap">days</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary"
+                            data-bs-dismiss="modal"
+                            data-action="live#action"
+                            data-live-action-param="generate">Generate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Renew modal ──────────────────────────────────────────────────────── #}
+    <div class="modal fade" id="webdav-token-renew-modal" tabindex="-1" aria-hidden="true" data-live-ignore>
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Renew WebDAV token</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="text-muted small text-nowrap mb-0">Valid for</label>
+                        <input type="number" class="form-control form-control-sm webdav-ttl-input"
+                               data-model="ttlDays" value="{{ this.ttlDays }}" min="1">
+                        <span class="text-muted small text-nowrap">days</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary"
+                            data-bs-dismiss="modal"
+                            data-action="live#action"
+                            data-live-action-param="renew">Renew
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Revoke modal ─────────────────────────────────────────────────────── #}
+    <div class="modal fade" id="webdav-token-revoke-modal" tabindex="-1" aria-hidden="true" data-live-ignore>
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Revoke WebDAV token</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to revoke this token? This cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger"
+                            data-bs-dismiss="modal"
+                            data-action="live#action"
+                            data-live-action-param="revoke">Revoke
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

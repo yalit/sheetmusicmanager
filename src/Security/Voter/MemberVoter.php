@@ -30,11 +30,18 @@ class MemberVoter extends Voter
             || (in_array($attribute, [self::DETAIL, self::EDIT, self::DELETE]) && $subject instanceof Member);
     }
 
-    /**
-     * @param UserInterface $subject
-     */
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        return $this->security->isGranted('ROLE_ADMIN');
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
+
+        if ($attribute === self::DETAIL && $subject instanceof Member) {
+            $user = $token->getUser();
+            return $user instanceof UserInterface
+                && $subject->getUserIdentifier() === $user->getUserIdentifier();
+        }
+
+        return false;
     }
 }
