@@ -3,9 +3,9 @@
 namespace App\Twig\Components;
 
 use App\Entity\Security\Member;
-use App\Entity\WebDAV\WebDavToken;
 use App\Service\WebDAV\WebDAVTokenHandler;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -27,8 +27,17 @@ final class WebDavTokenManager
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly WebDAVTokenHandler $webDAVTokenHandler,
+        private readonly WebDAVTokenHandler     $webDAVTokenHandler,
+        private readonly UrlGeneratorInterface  $urlGenerator,
     ) {}
+
+    public function getDavUrl(): string
+    {
+        return rtrim(
+            $this->urlGenerator->generate('webdav', ['path' => ''], UrlGeneratorInterface::ABSOLUTE_URL),
+            '/'
+        );
+    }
 
     #[LiveAction]
     public function generate(): void

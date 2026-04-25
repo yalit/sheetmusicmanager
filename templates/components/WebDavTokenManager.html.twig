@@ -40,7 +40,7 @@
     {# ── Actions row ──────────────────────────────────────────────────────── #}
     <div class="webdav-token-actions">
         {% if this.member.webDavToken is null %}
-            <button class="btn btn-primary"
+            <button class="btn btn-outline-primary"
                     data-bs-toggle="modal"
                     data-bs-target="#webdav-token-new-modal">Generate token
             </button>
@@ -55,6 +55,39 @@
             </button>
         {% endif %}
     </div>
+
+    {# ── Connection info ──────────────────────────────────────────────────── #}
+    <details class="webdav-connection-info">
+        <summary>WebDAV Connection info</summary>
+        <div class="webdav-connection-row">
+            <span class="webdav-connection-label">Server</span>
+            <code class="webdav-connection-value">{{ this.davUrl }}</code>
+            <button class="btn btn-light"
+                    data-controller="clipboard"
+                    data-clipboard-text-value="{{ this.davUrl }}"
+                    data-action="clipboard#copy"><i class="fa-regular fa-copy"></i></button>
+        </div>
+        <div class="webdav-connection-row">
+            <span class="webdav-connection-label">Username</span>
+            <code class="webdav-connection-value">{{ this.member.email }}</code>
+            <button class="btn btn-light"
+                    data-controller="clipboard"
+                    data-clipboard-text-value="{{ this.member.email }}"
+                    data-action="clipboard#copy"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </details>
+
+    {# ── iOS Files setup instructions ─────────────────────────────────────── #}
+    <details class="webdav-instructions">
+        <summary>How to connect in iOS Files</summary>
+        <ol>
+            <li>Open the <strong>Files</strong> app on your iPad or iPhone.</li>
+            <li>Tap <strong>Browse</strong> at the bottom, then tap <strong>…</strong> in the top-right and choose <strong>Connect to Server</strong>.</li>
+            <li>Enter the server URL above and tap <strong>Connect</strong>.</li>
+            <li>Select <strong>Registered User</strong>, enter your username and the access password (token above), then tap <strong>Next</strong>.</li>
+            <li>The server will appear under <strong>Locations</strong> in the Files sidebar.</li>
+        </ol>
+    </details>
 
     {# ── Generate modal ───────────────────────────────────────────────────── #}
     {# data-live-ignore: prevent morphdom from touching this while Bootstrap controls its state #}

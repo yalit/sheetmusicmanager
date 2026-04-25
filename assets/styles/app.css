@@ -117,6 +117,60 @@
     flex-direction: column;
     gap: 10px;
 
+    .webdav-divider {
+        margin: 0;
+        border-color: #dee2e6;
+    }
+
+    summary {
+        cursor: pointer;
+        color: #6c757d;
+        user-select: none;
+
+        &:hover {
+            color: #495057;
+        }
+    }
+
+    .webdav-connection-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .webdav-connection-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-left: 0.5em;
+
+            .webdav-connection-label {
+                font-size: 0.8em;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: #6c757d;
+                min-width: 70px;
+            }
+
+            .webdav-connection-value {
+                font-size: 0.85em;
+                flex-grow: 1;
+            }
+        }
+    }
+
+    .webdav-instructions {
+        ol {
+            margin: 8px 0 0 0;
+            padding-left: 1.5em;
+            color: #495057;
+
+            li + li {
+                margin-top: 4px;
+            }
+        }
+    }
+
     .webdav-token-information {
         display: flex;
         align-items: center;
