@@ -9,8 +9,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /** @package App\Controller\Admin */
 #[AdminDashboard(routePath: '/', routeName: 'admin')]
@@ -56,6 +58,15 @@ class DashboardController extends AbstractDashboardController
         $assets = parent::configureAssets();
 
         return $assets->addAssetMapperEntry('app');
+    }
+
+    public function configureUserMenu(UserInterface $user): UserMenu
+    {
+        $userMenu = parent::configureUserMenu($user);
+
+        $userMenu->addMenuItems([MenuItem::linkToRoute('View Profile', 'fa fa-user-gear','admin_member_detail', ['entityId' => $user->getId()])]);
+
+        return $userMenu;
     }
 
     public function configureMenuItems(): iterable
