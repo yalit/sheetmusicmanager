@@ -45,8 +45,9 @@ final class WebDavTokenManagerTest extends KernelTestCase
         static::assertNull($member->getWebDavToken());
         $html = $component->render()->toString();
 
-        static::assertStringContainsString('data-no-token', $html);
-        static::assertStringNotContainsString('data-token-expiry', $html);
+        static::assertStringContainsString('Generate token', $html);
+        static::assertStringNotContainsString('webdav-token-information', $html);
+        static::assertStringNotContainsString('data-plain-token', $html);
     }
 
     public function testRendersTokenExpiryWhenMemberHasActiveToken(): void
@@ -59,7 +60,7 @@ final class WebDavTokenManagerTest extends KernelTestCase
         $html = $component->render()->toString();
 
         static::assertStringNotContainsString('data-no-token', $html);
-        static::assertStringContainsString('data-token-expiry', $html);
+        static::assertStringContainsString('webdav-token-expiration-date', $html);
     }
 
     public function testDoesNotShowPlainTokenOnInitialRender(): void
@@ -211,7 +212,8 @@ final class WebDavTokenManagerTest extends KernelTestCase
 
         $html = $component->call('revoke')->render()->toString();
 
-        static::assertStringContainsString('data-no-token', $html);
+        static::assertStringContainsString('Generate token', $html);
+        static::assertStringNotContainsString('webdav-token-information', $html);
         static::assertStringNotContainsString('data-plain-token', $html);
     }
 
