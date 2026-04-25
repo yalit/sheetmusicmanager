@@ -42,13 +42,13 @@ final class WebDavTokenManager
     #[LiveAction]
     public function generate(): void
     {
-        $this->plainToken = $this->webDAVTokenHandler->new($this->member, $this->ttlDays);
+        $this->plainToken = $this->webDAVTokenHandler->new($this->member, max(1, $this->ttlDays));
     }
 
     #[LiveAction]
     public function renew(): void
     {
-        $this->plainToken = $this->webDAVTokenHandler->renew($this->member, $this->ttlDays);
+        $this->plainToken = $this->webDAVTokenHandler->renew($this->member, max(1, $this->ttlDays));
     }
 
     #[LiveAction]
