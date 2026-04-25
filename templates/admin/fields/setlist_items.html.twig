@@ -1,0 +1,24 @@
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+
+{% if field.value is empty %}
+    <span class="text-muted">—</span>
+{% else %}
+    <table class="table table-sm setlist-items-detail">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Sheet</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in field.value %}
+                <tr>
+                    <td class="text-muted text-end">{{ item.position }}</td>
+                    <td>{{ item.name }}</td>
+                    <td class="text-muted">{{ item.sheet }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

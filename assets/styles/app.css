@@ -1,3 +1,19 @@
+.setlist-items-detail {
+    th {
+        font-weight: 600;
+        font-size: 0.8em;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6c757d;
+        white-space: nowrap;
+    }
+
+    td:first-child {
+        width: 32px;
+        padding-right: 0;
+    }
+}
+
 /* Generic table collection */
 .table-collection {
     width: 100%;
