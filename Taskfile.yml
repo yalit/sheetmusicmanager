@@ -68,6 +68,7 @@ tasks:
         desc: Full project setup (install, migrate, load fixtures)
         cmds:
             - composer install
+            - bin/console importmap:install
             - task: reset
               vars: {ENV: 'dev'}
 
