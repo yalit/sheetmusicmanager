@@ -161,3 +161,5 @@ php bin/phpunit
 ```
 
 Tests use a separate SQLite test database. No external services required.
+
+This project is licensed under the terms of the MIT license (see [LICENSE.md](./LICENSE.md)).
